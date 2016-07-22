@@ -42,7 +42,7 @@ out
 # Maven
 log/
 target/
-search/apikeys.dat
-streamtest/apikeys.dat
 
+# Custom
+app.properties
 

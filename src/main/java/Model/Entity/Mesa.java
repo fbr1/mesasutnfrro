@@ -13,6 +13,8 @@ public class Mesa extends Entity{
         this.examenes = examenes;
     }
 
+    public Mesa () {} // Required for json parser
+
     public Date getFecha() {
         return fecha;
     }

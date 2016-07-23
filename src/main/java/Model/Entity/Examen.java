@@ -14,6 +14,8 @@ public class Examen extends Entity{
         this.materia = materia;
     }
 
+    public Examen() {} // Required for json parser
+
     public Date getFecha() {
         return fecha;
     }

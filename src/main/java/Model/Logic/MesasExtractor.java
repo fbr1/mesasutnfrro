@@ -47,18 +47,20 @@ public class MesasExtractor {
         return false;
     }
 
-    public void processPDF(PDDocument pdd, String date){
+    public Mesa processPDF(PDDocument pdd, String date){
+        Mesa mesa = null;
         try {
 
             PDFTextStripper stripper = new PDFTextStripper();
             String text=cleanText(stripper.getText(pdd));
-            Mesa mesa = extractMesa(text, date);
 
             pdd.close();
+            mesa = extractMesa(text, date);
         }
         catch(IOException ex) {
             logger.error(ex.getMessage(), ex);
         }
+        return mesa;
     }
 
     public String cleanText(String oriText){

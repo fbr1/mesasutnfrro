@@ -14,6 +14,8 @@ public class Llamado extends Entity{
         this.mesas = mesas;
     }
 
+    public Llamado () {} // Required for json parser
+
     public int getAño() {
         return año;
     }

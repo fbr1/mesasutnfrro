@@ -14,6 +14,8 @@ public class Materia extends Entity{
         this.especialidad = especialidad;
     }
 
+    public Materia () {} // Required for json parser
+
     public String getNombre() {
         return nombre;
     }

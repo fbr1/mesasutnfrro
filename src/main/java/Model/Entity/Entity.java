@@ -4,8 +4,6 @@ public class Entity {
 
     private int ID;
 
-
-
     public int getID() {
         return ID;
     }

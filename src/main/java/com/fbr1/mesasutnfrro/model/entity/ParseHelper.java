@@ -1,4 +1,4 @@
-package Model.Entity;
+package com.fbr1.mesasutnfrro.model.entity;
 
 import java.util.ArrayList;
 

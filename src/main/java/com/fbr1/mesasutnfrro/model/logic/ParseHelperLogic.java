@@ -1,8 +1,8 @@
-package Model.Logic;
+package com.fbr1.mesasutnfrro.model.logic;
 
-import Model.Entity.Examen;
-import Model.Entity.Materia;
-import Model.Entity.ParseHelper;
+import com.fbr1.mesasutnfrro.model.entity.Examen;
+import com.fbr1.mesasutnfrro.model.entity.Materia;
+import com.fbr1.mesasutnfrro.model.entity.ParseHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

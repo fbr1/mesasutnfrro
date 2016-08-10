@@ -1,6 +1,6 @@
-package Model.Logic;
+package com.fbr1.mesasutnfrro.model.logic;
 
-import Model.Data.VisitedURLsData;
+import com.fbr1.mesasutnfrro.model.data.VisitedURLsData;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

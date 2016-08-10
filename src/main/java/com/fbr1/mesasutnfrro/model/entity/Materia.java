@@ -1,12 +1,28 @@
-package Model.Entity;
+package com.fbr1.mesasutnfrro.model.entity;
 
-public class Materia extends Entity{
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
+
+import javax.persistence.*;
+
+@Entity
+@Table(name="materias")
+@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
+public class Materia {
 
     public enum Especialidades {
         ISI,IC,IQ,IM,IE
     }
 
+    @Id
+    @GeneratedValue(strategy= GenerationType.IDENTITY)
+    @Column(name="id_materia")
+    private int ID;
+
+    @Column(name="nombre")
     private String nombre;
+
+    @Column(name="especialidad")
     private String especialidad;
 
     public Materia(String nombre, String especialidad) {
@@ -15,6 +31,14 @@ public class Materia extends Entity{
     }
 
     public Materia () {} // Required for json parser
+
+    public int getID() {
+        return ID;
+    }
+
+    public void setID(int ID) {
+        this.ID = ID;
+    }
 
     public String getNombre() {
         return nombre;

@@ -1,0 +1,19 @@
+<hibernate-configuration>
+    <session-factory>
+        <property name="hibernate.connection.driver_class">com.mysql.jdbc.Driver</property>
+        <property name="hibernate.connection.url"></property>
+        <property name="hibernate.connection.username"></property>
+        <property name="hibernate.connection.password"></property>
+        <property name="hibernate.dialect">org.hibernate.dialect.MySQLDialect</property>
+        <property name="hibernate.current_session_context_class">thread</property>
+        <property name="hibernate.default_schema"></property>
+        <property name="hibernate.jdbc.batch_size property">20</property>
+        <property name="show_sql">true</property>
+        <mapping class="com.fbr1.mesasutnfrro.model.entity.VisitedURL"/>
+        <mapping class="com.fbr1.mesasutnfrro.model.entity.ApplicationVariables"/>
+        <mapping class="com.fbr1.mesasutnfrro.model.entity.Llamado"/>
+        <mapping class="com.fbr1.mesasutnfrro.model.entity.Mesa"/>
+        <mapping class="com.fbr1.mesasutnfrro.model.entity.Examen"/>
+        <mapping class="com.fbr1.mesasutnfrro.model.entity.Materia"/>
+    </session-factory>
+</hibernate-configuration>

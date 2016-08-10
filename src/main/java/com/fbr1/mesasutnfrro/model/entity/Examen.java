@@ -1,12 +1,30 @@
-package Model.Entity;
+package com.fbr1.mesasutnfrro.model.entity;
 
+import javax.persistence.*;
 import java.util.Date;
 
-public class Examen extends Entity{
+@Entity
+@Table(name="examenes")
+public class Examen {
 
+    @Id
+    @GeneratedValue(strategy= GenerationType.IDENTITY)
+    @Column(name="id_examen")
+    private int ID;
+
+    @Column(name="hora")
     private Date fecha;
+
+    @Column(name="aula")
     private String aula;
+
+    @OneToOne
+    @JoinColumn(name = "id_materia")
     private Materia materia;
+
+    @ManyToOne
+    @JoinColumn(name = "id_mesa")
+    private Mesa mesa;
 
     public Examen(Date fecha, String aula, Materia materia) {
         this.fecha = fecha;
@@ -15,6 +33,14 @@ public class Examen extends Entity{
     }
 
     public Examen() {} // Required for json parser
+
+    public int getID() {
+        return ID;
+    }
+
+    public void setID(int ID) {
+        this.ID = ID;
+    }
 
     public Date getFecha() {
         return fecha;

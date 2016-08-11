@@ -11,6 +11,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.TimeZone;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -60,9 +61,20 @@ public class ParseHelperLogic {
         ArrayList<ParseHelper> helpers = new ArrayList<>();
 
         String[] splitted = helper.getText().split(helper.getSplitPattern());
+        Pattern tempReGex = Pattern.compile(helper.getMatchPattern());
+        Matcher matcher = tempReGex.matcher(helper.getText());
+        List<String> splittedList= new ArrayList<>();
+        for(String line : splitted){
+            if(!line.isEmpty()){
+                if(matcher.find()){
+                    splittedList.add(matcher.group(1) + line);
+                }
+            }
+        }
+
         String[] lines;
         StringBuilder stringBuilder;
-        for(String textPart :splitted){
+        for(String textPart :splittedList){
 
             lines = textPart.split(System.getProperty("line.separator"));
             stringBuilder = new StringBuilder();
@@ -98,17 +110,19 @@ public class ParseHelperLogic {
      * @param especialidad - especialidad from the materia
      * @param aula - aula in which the examen is going to occur
      * @param examenStr - Materia's name and examen's hour
-     * @param date - Mesa's date in string format (dd-MM-yy)
+     * @param dateStr - Mesa's date in string format (dd-MM-yy)
      * @return      Examen Object
      */
-    private Examen buildExamen(String especialidad, String aula, String examenStr, String date){
+    private Examen buildExamen(String especialidad, String aula, String examenStr, String dateStr){
 
         // Extract hour
-        Pattern hoursPattern = Pattern.compile("(\\d{1,2}:\\d{2}:\\d{2})");
+        Pattern hoursPattern = Pattern.compile("(\\d{1,2}.\\d{2}.\\d{2})");
         Matcher m = hoursPattern.matcher(examenStr);
         String hourStr = null;
         if(m.find()){
             hourStr = m.group(1);
+            // Especial Case for using . instead of :
+            hourStr = hourStr.replace(".",":");
         }
 
         // Extract materia
@@ -122,7 +136,7 @@ public class ParseHelperLogic {
         if(hourStr.length() < HOUR_STR_LENGHT ){
             hourStr = HOUR_STR_FILLER + hourStr;
         }
-        hourStr = date + " " + hourStr;
+        hourStr = dateStr + " " + hourStr;
         Date fecha = new Date();
         try {
             fecha = examenDateFormat.parse(hourStr);

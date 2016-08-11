@@ -17,9 +17,12 @@ import org.slf4j.LoggerFactory;
 
 public class MesasExtractor {
 
-    private final Logger logger = LoggerFactory.getLogger(MesasExtractor.class);
+    private static final Logger logger = LoggerFactory.getLogger(MesasExtractor.class);
 
-    public Mesa processPDF(PDDocument pdd, String date){
+    private String nroLlamado = null;
+    private String año = null;
+
+    public Mesa processPDF(PDDocument pdd, String dateStr){
         Mesa mesa = null;
         try {
 
@@ -27,7 +30,7 @@ public class MesasExtractor {
             String text=cleanText(stripper.getText(pdd));
 
             pdd.close();
-            mesa = extractMesa(text, date);
+            mesa = extractMesa(text, dateStr);
         }
         catch(IOException ex) {
             logger.error(ex.getMessage(), ex);
@@ -39,16 +42,10 @@ public class MesasExtractor {
         StringBuilder stringBuilder = new StringBuilder();
 
         // Regex for 1-Mañana, 2-Tarde y 3-Noche
-        String turnoRegex = "\\d\\-\\w\\p{L}+ ";
+        String turnoRegex = "\\d-\\w\\p{L}+ ";
 
         // Regex for a year in the range 2000-2099
-        Pattern yearRegex = Pattern.compile("20\\d{2}");
-
-        // Regex for especialidades
-        Pattern especialidadRegex = Pattern.compile("(ISI |IE |IQ |IC |IM )");
-
-        // Regex matching one or more aulas
-        Pattern aulaRegex = Pattern.compile("(\\d{3}\\S+|\\d{3}) ");
+        Pattern yearRegex = Pattern.compile("(20\\d{2})");
 
         oriText = oriText.replaceAll(turnoRegex, "");
 
@@ -59,53 +56,147 @@ public class MesasExtractor {
             Matcher matcher = yearRegex.matcher(line);
 
             // Remove unnecessary lines
-            if(line.contains("DISTRIBUCION DE AULAS ") || line.contains("LLAMADO") ||
-                    line.contains("Horario") || matcher.find()){
+            if(line.contains("LLAMADO")){
+                if(nroLlamado == null){
+                    nroLlamado = line.substring(0,1);
+                }
+
+                line = "";
+            }else if(matcher.find()){
+                if(año == null){
+                    año = matcher.group(1);
+                }
+                line = "";
+            }else if(line.contains("DISTRIBUCION DE AULAS ") || line.contains("Horario")){
                 line = "";
             }
+
+            line = removeExtraSpaces(line);
 
             // If it's not a blank line
             if(line.trim().length() > 1){
 
-                line = removeExtraSpaces(line);
+                stringBuilder.append(line).append(System.getProperty("line.separator"));
 
-                // Make all the data format homogeneous
-                matcher = especialidadRegex.matcher(line);
-                if(matcher.find()){
-                    line = line.replace(matcher.group(1),matcher.group(1)+System.getProperty("line.separator"));
+            }
+
+        }
+        return normalizeText(stringBuilder.toString());
+    }
+
+    private String normalizeText(String text){
+        StringBuilder stringBuilder = new StringBuilder();
+
+        // Regex for especialidades
+        Pattern especialidadRegex = Pattern.compile("(ISI ?|IE ?|IQ ?|IC ?|IM ?)");
+
+        // Regex matching one or more aulas
+        Pattern aulaRegex = Pattern.compile("([\\d{1,3}\\/]+\\d{1,3} ?|\\d{1,3} ?|SUM)");
+
+        // Regex matching aula in line
+        Pattern aulaLineRegex = Pattern.compile("(^\\d{2,3}|SUM)$");
+
+        // Regex matching a line with only the time
+        Pattern hoursPattern = Pattern.compile("(^\\d{1,2}:\\d{2}:\\d{2}$)");
+
+        String[] lines = text.split(System.getProperty("line.separator"));
+
+        for(int i = 0; i< lines.length; i++){
+
+            String line = lines[i];
+
+            boolean skip = false;
+
+            // Make all the data format homogeneous
+            Matcher matcher = especialidadRegex.matcher(line);
+            boolean esEspecialidad = matcher.find();
+            if(esEspecialidad){
+                if(matcher.group(1).contains(" ")){
+                    line = line.replace(matcher.group(1),
+                            matcher.group(1).substring(0, matcher.group(1).length()-1)+System.getProperty("line.separator"));
+                }
+            }
+
+            matcher = aulaRegex.matcher(line);
+            boolean esAula = matcher.find();
+            if(esAula) {
+                if (matcher.group(1).contains(" ")) {
+                    line = line.replace(matcher.group(1),
+                            matcher.group(1).substring(0, matcher.group(1).length() - 1) + System.getProperty("line.separator"));
+                } else {
+                    // Special case for two aulas in different lines
+                    if(aulaLineRegex.matcher(line).find() && i-1 >=0 && i+1 < lines.length){
+
+                        matcher = aulaLineRegex.matcher(lines[i - 1]);
+                        if (matcher.find()) {
+                            String asd = matcher.group(1);
+                            line = matcher.group(1) + "/" + line;
+                        } else {
+                            matcher = aulaLineRegex.matcher(lines[i + 1]);
+                            if (matcher.find()) {
+                                skip = true;
+                            }
+                        }
+                    }
+
                 }
 
-                matcher = aulaRegex.matcher(line);
-                if(matcher.find()){
-                    line = line.replace(matcher.group(1)+" ",matcher.group(1)+System.getProperty("line.separator"));
-                }
+            }
 
+            // Special case for hours overlapping examenes' hour
+
+            if(!esEspecialidad && !esAula){
+                if(i-1>=0){
+                    matcher = hoursPattern.matcher(lines[i-1]);
+                    if(matcher.find()){
+                        line += " " + matcher.group(1);
+                    }else if(i+1<lines.length){
+                        matcher = hoursPattern.matcher(lines[i+1]);
+                        if(matcher.find()){
+                            line += " " + matcher.group(1);
+                            i++;
+                        }else{
+                            skip = true;
+                        }
+                    }else{
+                        skip = true;
+                    }
+                }
+            }
+
+
+            if(!skip){
                 stringBuilder.append(line).append(System.getProperty("line.separator"));
             }
 
         }
+
         return stringBuilder.toString();
     }
 
     private String removeExtraSpaces(String str){
-        // Remove extra white space at the end
-        if(str.charAt(str.length()-1)==' '){
-            str = str.substring(0, str.length()-1);
+
+        if(str.length() > 1){
+            // Remove extra white space at the end
+            if(str.charAt(str.length()-1)==' '){
+                str = str.substring(0, str.length()-1);
+            }
+            // Remove extra white space at the beginning
+            if(str.charAt(0)==' '){
+                str = str.substring(1, str.length());
+            }
         }
-        // Remove extra white space at the beginning
-        if(str.charAt(0)==' '){
-            str = str.substring(1, str.length());
-        }
+
         return str;
     }
 
-    public Mesa extractMesa(String text, String date){
+    private Mesa extractMesa(String text, String dateStr){
 
         // Transform date from String to Date
         DateFormat mesaDateFormat = new SimpleDateFormat("dd-MM-yy");
         Date mesaDate = new Date();
         try {
-            mesaDate = mesaDateFormat.parse(date);
+            mesaDate = mesaDateFormat.parse(dateStr);
         } catch (ParseException e) {
             logger.error(e.getMessage(), e);
         }
@@ -113,9 +204,13 @@ public class MesasExtractor {
         // Parse text to Examenes
         ParseHelper helper = new ParseHelper();
         helper.setText(text);
-        ArrayList<Examen> examenes = new ParseHelperLogic().getExamenes(helper, date);
+        ArrayList<Examen> examenes = new ParseHelperLogic().getExamenes(helper, dateStr);
 
         return new Mesa(mesaDate, examenes);
+    }
+
+    public String getNroLlamado() {
+        return nroLlamado;
     }
 
 }

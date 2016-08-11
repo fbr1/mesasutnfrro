@@ -18,11 +18,24 @@ public class ParseHelper {
     public String getSplitPattern(){
         switch(this.depth){
             case ParseHelper.ESPECIALIDAD:
-                return "\n(?=ISI|IE|IQ|IC|IM)";
+                return "(ISI|IE|IQ|IC|IM)\\n";
             case ParseHelper.AULA:
-                return "(?=\\d{3}\\S+|\\d{3})";
+                return "(?<!\\.|:)(?:(?:\\d{2,3})(?:\\/\\d{2,3})*|SUM)(?!\\.|:)";
             case ParseHelper.EXAMEN:
                 return System.getProperty("line.separator");
+            default:
+                return null;
+        }
+    }
+
+    public String getMatchPattern(){
+        switch(this.depth){
+            case ParseHelper.ESPECIALIDAD:
+                return "(ISI|IE|IQ|IC|IM)\\n";
+            case ParseHelper.AULA:
+                return "(?<!\\.|:)((?:\\d{2,3})(?:\\/\\d{2,3})*|SUM)(?!\\.|:)";
+            case ParseHelper.EXAMEN:
+                return "()";
             default:
                 return null;
         }

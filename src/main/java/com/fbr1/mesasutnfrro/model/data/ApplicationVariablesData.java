@@ -5,36 +5,71 @@ import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
 import org.hibernate.query.Query;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 public class ApplicationVariablesData {
 
+    private final static Logger logger = LoggerFactory.getLogger(ApplicationVariablesData.class);
+
     public ApplicationVariables get(){
-        SessionFactory sessionFactory = HibernateManager.getSessionFactory();
-        Session session = sessionFactory.getCurrentSession();
 
-        Transaction tx = session.beginTransaction();
-        Query query = session.createQuery("from ApplicationVariables av " +
-                                          "where av.id = " +
-                                          "(select max(avv.id) from ApplicationVariables avv)");
+        Session session = null;
+        Transaction tx = null;
+        ApplicationVariables appVars = null;
 
-        ApplicationVariables appVars = (ApplicationVariables) query.getSingleResult();
+        try{
+            SessionFactory sessionFactory = HibernateManager.getSessionFactory();
+            session = sessionFactory.getCurrentSession();
 
-        tx.commit();
-        session.close();
+            tx = session.beginTransaction();
+
+            Query query = session.createQuery("from ApplicationVariables av " +
+                    "where av.id = " +
+                    "(select max(avv.id) from ApplicationVariables avv)");
+
+            appVars = (ApplicationVariables) query.getSingleResult();
+
+            tx.commit();
+        }catch (Exception ex){
+            if (tx != null){
+                tx.rollback();
+            }
+            logger.error(ex.getMessage(), ex);
+        }finally {
+            if (session != null){
+                session.close();
+            }
+        }
 
         return appVars;
     }
 
     public void update(ApplicationVariables appVars){
-        SessionFactory sessionFactory = HibernateManager.getSessionFactory();
 
-        Session session = sessionFactory.getCurrentSession();
-        Transaction tx = session.beginTransaction();
+        Session session = null;
+        Transaction tx = null;
 
-        session.update(appVars);
+        try{
+            SessionFactory sessionFactory = HibernateManager.getSessionFactory();
+            session = sessionFactory.getCurrentSession();
 
-        tx.commit();
-        session.close();
+            tx = session.beginTransaction();
+
+            session.update(appVars);
+
+            tx.commit();
+        }catch (Exception ex){
+            if (tx != null){
+                tx.rollback();
+            }
+            logger.error(ex.getMessage(), ex);
+        }finally {
+            if (session != null){
+                session.close();
+            }
+        }
+
     }
 }

@@ -19,42 +19,74 @@ public class VisitedURLsData {
 
 
     public Set<String> getAll(){
-        Set<String> urlList = new HashSet<>();
-        SessionFactory sessionFactory = HibernateManager.getSessionFactory();
-        Session session = sessionFactory.getCurrentSession();
 
-        Transaction tx = session.beginTransaction();
-        Query query = session.createQuery("from VisitedURL");
-        List<VisitedURL> visitedURLs = query.list();
-        for (VisitedURL vu : visitedURLs){
-            urlList.add(vu.getUrl());
+        Session session = null;
+        Transaction tx = null;
+        List<VisitedURL> visitedURLs = null;
+        Set<String> urlList = new HashSet<>();
+
+        try{
+            SessionFactory sessionFactory = HibernateManager.getSessionFactory();
+            session = sessionFactory.getCurrentSession();
+
+            tx = session.beginTransaction();
+
+            Query query = session.createQuery("from VisitedURL");
+
+            visitedURLs = query.list();
+            for (VisitedURL vu : visitedURLs){
+                urlList.add(vu.getUrl());
+            }
+            tx.commit();
+        }catch (Exception ex){
+            if (tx != null){
+                tx.rollback();
+            }
+            logger.error(ex.getMessage(), ex);
+        }finally {
+            if (session != null){
+                session.close();
+            }
         }
-        tx.commit();
-        session.close();
 
         return urlList;
     }
 
     public void addAll(Set<String> URLs){
-        SessionFactory sessionFactory = HibernateManager.getSessionFactory();
 
-        Session session = sessionFactory.getCurrentSession();
-        Transaction tx = session.beginTransaction();
+        Session session = null;
+        Transaction tx = null;
 
-        int i = 0;
-        for ( String url : URLs) {
+        try{
+            SessionFactory sessionFactory = HibernateManager.getSessionFactory();
+            session = sessionFactory.getCurrentSession();
 
-            VisitedURL visitedURL = new VisitedURL(url);
-            session.save(visitedURL);
+            tx = session.beginTransaction();
 
-            if ( i % 20 == 0 ) {
-                // Clear cache
-                session.flush();
-                session.clear();
+            int i = 0;
+            for ( String url : URLs) {
+
+                VisitedURL visitedURL = new VisitedURL(url);
+                session.save(visitedURL);
+
+                if ( i % 20 == 0 ) {
+                    // Clear cache
+                    session.flush();
+                    session.clear();
+                }
+                i++;
             }
-            i++;
+            tx.commit();
+
+        }catch (Exception ex){
+            if (tx != null){
+                tx.rollback();
+            }
+            logger.error(ex.getMessage(), ex);
+        }finally {
+            if (session != null){
+                session.close();
+            }
         }
-        tx.commit();
-        session.close();
     }
 }

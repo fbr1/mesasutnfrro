@@ -17,70 +17,126 @@ public class LlamadosData {
     private final static Logger logger = LoggerFactory.getLogger(LlamadosData.class);
 
     public List<Llamado> getAll(){
+        Session session = null;
+        Transaction tx = null;
+        List<Llamado> llamadosList = null;
 
-        SessionFactory sessionFactory = HibernateManager.getSessionFactory();
-        Session session = sessionFactory.getCurrentSession();
+        try{
+            SessionFactory sessionFactory = HibernateManager.getSessionFactory();
+            session = sessionFactory.getCurrentSession();
 
-        Transaction tx = session.beginTransaction();
+            tx = session.beginTransaction();
 
-        Query query = session.createQuery("from Llamado");
+            Query query = session.createQuery("from Llamado");
 
-        List<Llamado> llamadosList = query.list();
-        tx.commit();
-        session.close();
+            llamadosList = query.list();
+            tx.commit();
+        }catch (Exception ex){
+            if (tx != null){
+                tx.rollback();
+            }
+            logger.error(ex.getMessage(), ex);
+        }finally {
+            if (session != null){
+                session.close();
+            }
+        }
 
         return llamadosList;
     }
 
     public List<Llamado> getLlamadosOfYear(int year){
-        SessionFactory sessionFactory = HibernateManager.getSessionFactory();
-        Session session = sessionFactory.getCurrentSession();
+        Session session = null;
+        Transaction tx = null;
+        List<Llamado> llamadosList = null;
 
-        Transaction tx = session.beginTransaction();
+        try{
+            SessionFactory sessionFactory = HibernateManager.getSessionFactory();
+            session = sessionFactory.getCurrentSession();
 
-        Query query = session.createQuery("from Llamado l where l.año =:año" )
-                             .setParameter("año", year);
+            tx = session.beginTransaction();
 
-        List<Llamado> llamadosList = query.list();
-        tx.commit();
-        session.close();
+            Query query = session.createQuery("from Llamado l where l.año =:año" )
+                    .setParameter("año", year);
+
+            llamadosList = query.list();
+            tx.commit();
+        }catch (Exception ex){
+            if (tx != null){
+                tx.rollback();
+            }
+            logger.error(ex.getMessage(), ex);
+        }finally {
+            if (session != null){
+                session.close();
+            }
+        }
 
         return llamadosList;
     }
 
     public Llamado getLlamado(int year, int numero){
-        SessionFactory sessionFactory = HibernateManager.getSessionFactory();
-        Session session = sessionFactory.getCurrentSession();
+        Session session = null;
+        Transaction tx = null;
+        Llamado llamado = null;
 
-        Transaction tx = session.beginTransaction();
+        try{
+            SessionFactory sessionFactory = HibernateManager.getSessionFactory();
+            session = sessionFactory.getCurrentSession();
 
-        Query query = session.createQuery("from Llamado l " +
-                "where l.año =:año and l.numero=:numero" )
-                .setParameter("año", year)
-                .setParameter("numero", numero);
+            tx = session.beginTransaction();
 
-        Llamado llamado = (Llamado) query.getSingleResult();
-        tx.commit();
-        session.close();
+            Query query = session.createQuery("from Llamado l " +
+                    "where l.año =:año and l.numero=:numero" )
+                    .setParameter("año", year)
+                    .setParameter("numero", numero);
+
+            llamado = (Llamado) query.getSingleResult();
+            tx.commit();
+        }catch (Exception ex){
+            if (tx != null){
+                tx.rollback();
+            }
+            logger.error(ex.getMessage(), ex);
+        }finally {
+            if (session != null){
+                session.close();
+            }
+        }
 
         return llamado;
     }
 
     public Llamado getlastLlamado(){
-        SessionFactory sessionFactory = HibernateManager.getSessionFactory();
-        Session session = sessionFactory.getCurrentSession();
+        Session session = null;
+        Transaction tx = null;
+        Llamado llamado = null;
 
-        Transaction tx = session.beginTransaction();
+        try{
+            SessionFactory sessionFactory = HibernateManager.getSessionFactory();
+            session = sessionFactory.getCurrentSession();
 
-        Query query = session.createQuery("from Llamado l " +
-                                          "where l.date = " +
-                                          "(select max(ll.date) from Llamado ll)");
+            tx = session.beginTransaction();
 
-        Llamado llamado = (Llamado) query.getSingleResult();
-        tx.commit();
-        session.close();
+            Query query = session.createQuery("from Llamado l " +
+                    "where l.date = " +
+                    "(select max(ll.date) from Llamado ll)");
+
+            llamado = (Llamado) query.getSingleResult();
+            tx.commit();
+        }catch (Exception ex){
+            if (tx != null){
+                tx.rollback();
+            }
+            logger.error(ex.getMessage(), ex);
+        }finally {
+            if (session != null){
+                session.close();
+            }
+        }
 
         return llamado;
+
     }
 
 }

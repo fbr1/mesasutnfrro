@@ -18,9 +18,9 @@ public class ParseHelper {
     public String getSplitPattern(){
         switch(this.depth){
             case ParseHelper.ESPECIALIDAD:
-                return "(ISI|IE|IQ|IC|IM)\\n";
+                return "(?:ISI|IE|IQ|IC|IM)\\n";
             case ParseHelper.AULA:
-                return "(?<!\\.|:)(?:(?:\\d{2,3})(?:\\/\\d{2,3})*|SUM)(?!\\.|:)";
+                return "(?<!\\.|:)(?:(?:\\d{2,3})(?:\\/\\d{1,3})*|SUM)\\n(?!\\.|:)";
             case ParseHelper.EXAMEN:
                 return System.getProperty("line.separator");
             default:
@@ -31,9 +31,9 @@ public class ParseHelper {
     public String getMatchPattern(){
         switch(this.depth){
             case ParseHelper.ESPECIALIDAD:
-                return "(ISI|IE|IQ|IC|IM)\\n";
+                return "((?:ISI|IE|IQ|IC|IM)\\n)";
             case ParseHelper.AULA:
-                return "(?<!\\.|:)((?:\\d{2,3})(?:\\/\\d{2,3})*|SUM)(?!\\.|:)";
+                return "(?<!\\.|:)((?:(?:\\d{2,3})(?:\\/\\d{1,3})*|SUM)\\n)(?!\\.|:)";
             case ParseHelper.EXAMEN:
                 return "()";
             default:

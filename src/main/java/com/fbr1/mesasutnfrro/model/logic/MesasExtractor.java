@@ -19,9 +19,16 @@ public class MesasExtractor {
 
     private static final Logger logger = LoggerFactory.getLogger(MesasExtractor.class);
 
-    private String nroLlamado = null;
-    private String año = null;
+    private int nroLlamado = 0;
+    private int año = 0;
 
+    /**
+     * Extracts a Mesa from the given pdf
+     *
+     * @param pdd - PDDocument pdf document containing Examanes
+     * @param dateStr - date String from the mesa in the format: (dd-MM-yy)
+     * @return      Mesa extracted from the pdf document
+     */
     public Mesa processPDF(PDDocument pdd, String dateStr){
         Mesa mesa = null;
         try {
@@ -38,6 +45,13 @@ public class MesasExtractor {
         return mesa;
     }
 
+    /**
+     * Cleans and normalizes the text stripped from the Examanes pdf
+     * The goal of this is to have a uniform format from which later it can be casted into objects
+     *
+     * @param oriText - Text stripped from the Examenes PDF
+     * @return      String containing an uniform format of Examanes
+     */
     public String cleanText(String oriText){
         StringBuilder stringBuilder = new StringBuilder();
 
@@ -57,14 +71,14 @@ public class MesasExtractor {
 
             // Remove unnecessary lines
             if(line.contains("LLAMADO")){
-                if(nroLlamado == null){
-                    nroLlamado = line.substring(0,1);
+                if(nroLlamado == 0 ){
+                    nroLlamado = Integer.valueOf(line.substring(0,1));
                 }
 
                 line = "";
             }else if(matcher.find()){
-                if(año == null){
-                    año = matcher.group(1);
+                if(año == 0){
+                    año = Integer.valueOf(matcher.group(1));
                 }
                 line = "";
             }else if(line.contains("DISTRIBUCION DE AULAS ") || line.contains("Horario")){
@@ -83,7 +97,13 @@ public class MesasExtractor {
         }
         return normalizeText(stringBuilder.toString());
     }
-
+    /**
+     * Normalizes an already cleaned text stripped from Examenes PDF.
+     * Makes sure that every Especialidad, Aula and Examen is in its own line.
+     *
+     * @param text - text cleaned from the Examenes PDF
+     * @return      String containing an normalized format of Examanes
+     */
     private String normalizeText(String text){
         StringBuilder stringBuilder = new StringBuilder();
 
@@ -129,7 +149,6 @@ public class MesasExtractor {
 
                         matcher = aulaLineRegex.matcher(lines[i - 1]);
                         if (matcher.find()) {
-                            String asd = matcher.group(1);
                             line = matcher.group(1) + "/" + line;
                         } else {
                             matcher = aulaLineRegex.matcher(lines[i + 1]);
@@ -190,6 +209,13 @@ public class MesasExtractor {
         return str;
     }
 
+    /**
+     * Cast the normalized text into a Mesa Object
+     *
+     * @param text - text cleaned and normalized from the Examenes PDF
+     * @param dateStr - date String from the mesa in the format: (dd-MM-yy)
+     * @return      Mesa object
+     */
     private Mesa extractMesa(String text, String dateStr){
 
         // Transform date from String to Date
@@ -204,13 +230,23 @@ public class MesasExtractor {
         // Parse text to Examenes
         ParseHelper helper = new ParseHelper();
         helper.setText(text);
-        ArrayList<Examen> examenes = new ParseHelperLogic().getExamenes(helper, dateStr);
 
-        return new Mesa(mesaDate, examenes);
+        Mesa mesa = new Mesa();
+        mesa.setFecha(mesaDate);
+        ArrayList<Examen> examenes = new ParseHelperLogic().getExamenes(helper, dateStr);
+        for(Examen examen : examenes){
+            examen.setMesa(mesa);
+        }
+        mesa.setExamenes(examenes);
+
+        return mesa;
     }
 
-    public String getNroLlamado() {
+    public int getNroLlamado() {
         return nroLlamado;
     }
 
+    public int getAño() {
+        return año;
+    }
 }

@@ -15,11 +15,11 @@ public class MesasController {
 
     @RequestMapping(value = "/updatemesas")
     public String updatemesas(Model model) {
-        String statusText;
-        if(UpdateLogic.isTimeForUpdate()){
-            statusText = "It's time for an update";
-        }else{
-            statusText = "It's not time for an update";
+        UpdateLogic updateLogic = new UpdateLogic();
+        String statusText = "no update";
+        if(updateLogic.isTimeForUpdate()){
+            updateLogic.checkUpdates();
+            statusText = "update";
         }
         model.addAttribute("statusText", statusText);
         return "updatemesas";

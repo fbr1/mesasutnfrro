@@ -2,6 +2,9 @@ package com.fbr1.mesasutnfrro.model.logic;
 
 import com.fbr1.mesasutnfrro.model.data.ApplicationVariablesData;
 import com.fbr1.mesasutnfrro.model.entity.ApplicationVariables;
+import com.fbr1.mesasutnfrro.model.entity.Llamado;
+import com.fbr1.mesasutnfrro.model.entity.Mesa;
+import org.apache.pdfbox.pdmodel.PDDocument;
 import org.jsoup.Connection;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -11,7 +14,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.util.Set;
+import java.io.InputStream;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class UpdateLogic {
 
@@ -21,38 +30,126 @@ public class UpdateLogic {
     private static final String URL_SELECTOR = "a:containsOwn(ver listado)";
     private static final String CRAWLING_PAGE = "http://www.frro.utn.edu.ar/contenido.php?cont=528&subc=5";
     private Set<String> urls = null;
-
     private final static Logger logger = LoggerFactory.getLogger(UpdateLogic.class);
 
-    public void setURLs(Set<String> urls){
-        this.urls = urls;
+
+    /**
+     * If the urls hadn't already been seen,
+     * extracts the Llamado from the raw PDFs in the urls and saves it.
+     *
+     */
+    public void checkUpdates(){
+        if(isContentNew()){
+
+            try{
+                List<Mesa> mesas = new ArrayList<>();
+                MesasExtractor mesasExtractor = new MesasExtractor();
+                Llamado llamado = new Llamado();
+
+                for(String urlS : this.urls) {
+
+                    // Get date
+                    String date = getDateFromUrl(urlS);
+
+                    // Get and open pdf
+                    URL url = new URL(urlS);
+                    HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+                    InputStream is = connection.getInputStream();
+                    PDDocument pdd = PDDocument.load(is);
+                    connection.disconnect();
+
+                    // Extract mesa
+                    Mesa mesa = mesasExtractor.processPDF(pdd, date);
+                    mesa.setLlamado(llamado);
+                    mesas.add(mesa);
+
+                }
+
+                Date dateLlamado = mesas.get(0).getFecha();
+                int añoLlamado = mesasExtractor.getAño();
+                int numeroLlamado = mesasExtractor.getNroLlamado();
+
+                llamado.setAño(añoLlamado);
+                llamado.setNumero(numeroLlamado);
+                llamado.setDate(dateLlamado);
+                llamado.setMesas(mesas);
+
+                new LlamadosLogic().add(llamado);
+                logger.info("New Llamado added | Año: "+ añoLlamado + " Numero: " + numeroLlamado);
+
+            }catch (MalformedURLException urle){
+                logger.error(urle.getMessage(), urle);
+            }catch (IOException ioe){
+                logger.error(ioe.getMessage(), ioe);
+            }catch (Exception e){
+                logger.error(e.getMessage(), e);
+            }
+
+        }
     }
 
-    public boolean isContentNew(){
-        VisitedURLsLogic visitedURLsLogic = new VisitedURLsLogic();
+    /**
+     * Returns date String in the format:(dd-MM-yy) extracted from 'url'
+     *
+     * @param url - Url string to extract date
+     * @return      date extracted from url string
+     */
+    private String getDateFromUrl (String url) throws Exception{
+        Pattern p = Pattern.compile("(\\d{1,2}-\\d{1,2}-\\d{1,2})");
+        Matcher m = p.matcher(url);
 
-        Set<String> processedURLs = visitedURLsLogic.getAll();
+        String dateStr;
 
-        if(!processedURLs.containsAll(this.urls)){
-            visitedURLsLogic.addAll(this.urls);
-            logger.info("Add URLs: ", this.urls);
-            return true;
+        if (m.find()) {
+            dateStr = m.group(1);
+            System.out.println(m.group(1));
         }else{
-            logger.info("URLs already seen");
+            throw new Exception("The url: " + url + "doesn't have a date");
+        }
+
+        return dateStr;
+    }
+
+    /**
+     * Checks for urls in CRAWLING_PAGE and compares them to urls already seen
+     *
+     * @return      whether the current URLs are new to the system or not
+     */
+    private boolean isContentNew(){
+
+        // If crawling is successful
+        if( crawl(CRAWLING_PAGE) ){
+
+            VisitedURLsLogic visitedURLsLogic = new VisitedURLsLogic();
+
+            Set<String> processedURLs = visitedURLsLogic.getAll();
+
+            if(!this.urls.isEmpty() && !processedURLs.containsAll(this.urls)){
+                visitedURLsLogic.addAll(this.urls);
+                logger.info("Add URLs: ", this.urls);
+                return true;
+            }else{
+                logger.info("URLs already seen");
+            }
         }
         return false;
     }
 
-
     /**
-     * Returns true if crawling was successful.
+     * Tries to crawl the String 'url'
+     * If crawling was successful, stores the Set of urls inside URL_SELECTOR in the
+     * instance variable urls and returns true
+     *
+     * 'Crawl' is the action of extracting html content from a given url
+     * Crawling is successful if a page returns status 200 and has HTML code inside
      *
      * @param url - The URL to visit
-     * @return      whether the crawling was successful
+     * @return      Whether the crawling was successful
      */
-    public boolean crawl(String url){
+    private boolean crawl(String url){
         try
         {
+            this.urls = new HashSet<>();
             Connection connection = Jsoup.connect(url).userAgent(USER_AGENT);
             Document htmlDocument = connection.get();
             if(connection.response().statusCode() == 200)
@@ -64,6 +161,7 @@ public class UpdateLogic {
                 logger.info("**Failure** Retrieved something other than HTML");
                 return false;
             }
+
             Elements urlsOnPage = htmlDocument.select(URL_SELECTOR);
             logger.info("Found (" + urlsOnPage.size() + ") urls");
             for(Element link : urlsOnPage)
@@ -77,7 +175,7 @@ public class UpdateLogic {
         catch(IOException ioe)
         {
             // We were not successful in our HTTP request
-            logger.error(ioe.getMessage());
+            logger.error(ioe.getMessage(), ioe);
             return false;
         }
     }
@@ -88,12 +186,13 @@ public class UpdateLogic {
      *
      * @return      whether is time or not for an update
      */
-    static public boolean isTimeForUpdate(){
+    public boolean isTimeForUpdate(){
 
         Long currentTime = System.currentTimeMillis();
-        ApplicationVariablesData appVarsData = new ApplicationVariablesData();
 
-        ApplicationVariables appVars = appVarsData.get();
+        ApplicationVariablesLogic appVarsLogic = new ApplicationVariablesLogic();
+
+        ApplicationVariables appVars = appVarsLogic.get();
 
         Long lastUpdate = appVars.getLastupdate();
 
@@ -101,7 +200,7 @@ public class UpdateLogic {
 
             // If it's the first execution of the webapp instance
             appVars.setLastupdate(currentTime);
-            appVarsData.update(appVars);
+            appVarsLogic.update(appVars);
             return true;
 
         } else {
@@ -111,7 +210,7 @@ public class UpdateLogic {
             if (timeSinceLastUpdate > UPDATE_INTERVAL) {
                 // Update last update time
                 appVars.setLastupdate(currentTime);
-                appVarsData.update(appVars);
+                appVarsLogic.update(appVars);
                 return true;
             }
         }

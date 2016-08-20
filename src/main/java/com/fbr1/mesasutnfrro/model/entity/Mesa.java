@@ -17,7 +17,7 @@ public class Mesa {
     @Column(name="fecha")
     private Date fecha;
 
-    @OneToMany(mappedBy = "mesa", fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "mesa", fetch = FetchType.EAGER, cascade={CascadeType.ALL})
     private List<Examen> examenes;
 
     @ManyToOne

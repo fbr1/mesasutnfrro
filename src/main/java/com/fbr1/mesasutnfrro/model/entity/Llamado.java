@@ -27,13 +27,14 @@ public class Llamado{
     @Column(name="date")
     private Date date;
 
-    @OneToMany(mappedBy="llamado", fetch = FetchType.EAGER)
+    @OneToMany(mappedBy="llamado", fetch = FetchType.EAGER, cascade={CascadeType.ALL})
     private List<Mesa> mesas;
 
-    public Llamado(int año, int numero, ArrayList<Mesa> mesas) {
+    public Llamado(int año, int numero, List<Mesa> mesas, Date date) {
         this.año = año;
         this.numero = numero;
         this.mesas = mesas;
+        this.date = date;
     }
 
     public Llamado () {} // Required for json parser

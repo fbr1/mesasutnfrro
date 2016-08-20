@@ -18,8 +18,8 @@ public class Examen {
     @Column(name="aula")
     private String aula;
 
-    @OneToOne
-    @JoinColumn(name = "id_materia")
+    @OneToOne(cascade={CascadeType.ALL})
+    @JoinColumn(name = "id_materia" )
     private Materia materia;
 
     @ManyToOne
@@ -64,5 +64,13 @@ public class Examen {
 
     public void setMateria(Materia materia) {
         this.materia = materia;
+    }
+
+    public Mesa getMesa() {
+        return mesa;
+    }
+
+    public void setMesa(Mesa mesa) {
+        this.mesa = mesa;
     }
 }

@@ -8,9 +8,7 @@ import org.hibernate.query.Query;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.lang.reflect.Array;
 import java.util.List;
-import java.util.Objects;
 
 public class LlamadosData {
 
@@ -137,6 +135,32 @@ public class LlamadosData {
 
         return llamado;
 
+    }
+
+    public void add(Llamado llamado){
+        Session session = null;
+        Transaction tx = null;
+
+        try{
+            SessionFactory sessionFactory = HibernateManager.getSessionFactory();
+            session = sessionFactory.getCurrentSession();
+
+            tx = session.beginTransaction();
+
+            session.save(llamado);
+
+            tx.commit();
+
+        }catch (Exception ex){
+            if (tx != null){
+                tx.rollback();
+            }
+            logger.error(ex.getMessage(), ex);
+        }finally {
+            if (session != null){
+                session.close();
+            }
+        }
     }
 
 }

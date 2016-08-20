@@ -2,8 +2,8 @@ package com.fbr1.mesasutnfrro.controller;
 
 import java.util.List;
 
-import com.fbr1.mesasutnfrro.model.data.LlamadosData;
 import com.fbr1.mesasutnfrro.model.entity.Llamado;
+import com.fbr1.mesasutnfrro.model.logic.LlamadosLogic;
 import org.springframework.web.bind.annotation.*;
 
 
@@ -16,7 +16,7 @@ public class MesasRESTService {
                     method= RequestMethod.GET)
     public Llamado getLastLlamado(@RequestParam(value="esp", defaultValue="ALL") String esp){
 
-        return new LlamadosData().getlastLlamado();
+        return new LlamadosLogic().getlastLlamado();
     }
 
     @RequestMapping(value= baseRestUrl + "/{year}",
@@ -24,7 +24,7 @@ public class MesasRESTService {
     public List<Llamado> getAllLlamadosOfYear(@PathVariable int year,
                                        @RequestParam(value="esp", defaultValue="ALL") String esp){
 
-        return new LlamadosData().getLlamadosOfYear(year);
+        return new LlamadosLogic().getLlamadosOfYear(year);
     }
 
     @RequestMapping(value= baseRestUrl + "/{year}/{numero}",
@@ -33,7 +33,7 @@ public class MesasRESTService {
                                    @PathVariable int numero,
                                    @RequestParam(value="esp", defaultValue="ALL") String esp){
 
-        return new LlamadosData().getLlamado(year,numero);
+        return new LlamadosLogic().getLlamado(year,numero);
     }
 
 }

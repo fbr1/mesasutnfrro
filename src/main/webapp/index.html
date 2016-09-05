@@ -1,1 +1,92 @@
-<h1>HELLOOOO</h1>
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <!--<link href="http://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">-->
+        <link type="text/css" rel="stylesheet" href="css/materialize.css"  media="screen,projection"/>
+        <link type="text/css" rel="stylesheet" href="css/mesasutnfrro.css"  media="screen,projection"/>
+
+        <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    </head>
+
+    <body>
+        <div id="container" class="container">
+            <!-- Barra de navegación -->
+            <nav>
+                <div class="nav-wrapper light-blue accent-4">
+                    <a href="#" class="center brand-logo">Mesas UTN Frro</a>
+                    <a href="#" data-activates="mobile-demo" class="button-collapse">
+                        <i class="material-icons">menu</i>
+                    </a>
+                    <ul id="nav-mobile" class="right hide-on-med-and-down">
+                        <li>
+                            <a href="#">Contacto</a>
+                        </li>
+                    </ul>
+                    <ul class="side-nav" id="mobile-demo">
+                        <li>
+                            <a href="#">Contacto</a>
+                        </li>
+                    </ul>
+                </div>
+            </nav>
+            <section id="contenido">
+                <div class="card light-blue">
+                    <div class="card-content white-text">
+                        <span class="card-title" data-bind="text: 'Llamado a examen número ' + numero() + '. Año ' + anio()"></span>
+
+                    </div>
+                    <div class="right-align card-action">
+                        <div id="filtros" class="row">
+                            <div class="input-field col s12 m3" >
+                                <select id="filtroEspecialidad">
+									<option value="" selected>Todas</option>
+                                    <option value="ISI">Ingeniería en sistemas</option>
+                                    <option value="IQ">Ingeniería química</option>
+                                    <option value="IM">Ingeniería mecánica</option>
+                                    <option value="IC">Ingeniería civil</option>
+                                    <option value="IE">Ingeniería eléctrica</option>
+                                </select>
+                                <label>Especialidad</label>
+                            </div>
+                        </div>
+                        <a class="waves-effect waves-light btn" href="#" data-bind="click: aplicarFiltros">Aplicar filtros</a>
+                    </div>
+                </div>
+                <div id="mesas" data-bind="foreach: mesas">
+                    <ul class="collection with-header">
+                        <li class="collection-header">
+                            <h3>Mesa dia <span data-bind="text: fechaFormateada()"></span></h3>
+                        </li>
+
+                        <li class="collection-item">
+                            <table class="striped">
+                                <thead>
+                                    <tr>
+                                        <th data-field="materia">Materia</th>
+                                        <th data-field="aula">Aula</th>
+                                        <th data-field="fecha">Fecha</th>
+                                    </tr>
+                                </thead>
+
+                                <tbody data-bind="foreach: examenes">
+                                    <tr data-bind="visible: pasaFiltros()">
+                                        <td data-bind="text: materia.nombre()"></td>
+                                        <td data-bind="text: aula()"></td>
+                                        <td data-bind="text: fechaFormateada()"></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </li>
+                    </ul>
+                </div>
+            </section>
+        </div>
+
+        <script type="text/javascript" src="js/jquery-2.2.3.min.js"></script>
+        <script type="text/javascript" src="js/materialize.js"></script>
+        <script type="text/javascript" src="js/ko.js"></script>
+        <script type="text/javascript" src="js/knockout.mapping-latest.debug.js"></script>
+        <script type="text/javascript" src="js/mesasutnfrro.js"></script>
+    </body>
+</html>

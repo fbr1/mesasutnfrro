@@ -1,23 +1,21 @@
 package com.fbr1.mesasutnfrro.model.logic;
 
-import com.fbr1.mesasutnfrro.model.data.ApplicationVariablesData;
+import com.fbr1.mesasutnfrro.model.data.ApplicationVariablesRepository;
 import com.fbr1.mesasutnfrro.model.entity.ApplicationVariables;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
+@Service
 public class ApplicationVariablesLogic {
 
-    private ApplicationVariablesData applicationVariablesData;
     private final static Logger logger = LoggerFactory.getLogger(ApplicationVariablesLogic.class);
-
-    public ApplicationVariablesLogic(){
-        applicationVariablesData = new ApplicationVariablesData();
-    }
 
     public ApplicationVariables get(){
         ApplicationVariables applicationVariables= null;
         try{
-            applicationVariables =this.applicationVariablesData.get();
+            applicationVariables = applicationVariablesRepository.findTop();
         }catch(Exception Ex){
             logger.error(Ex.getMessage(), Ex);
         }
@@ -27,11 +25,14 @@ public class ApplicationVariablesLogic {
     public void update(ApplicationVariables applicationVariables){
         try{
 
-            this.applicationVariablesData.update(applicationVariables);
+            applicationVariablesRepository.save(applicationVariables);
 
         }catch(Exception Ex){
             logger.error(Ex.getMessage(), Ex);
         }
     }
+
+    @Autowired
+    private ApplicationVariablesRepository applicationVariablesRepository;
 
 }

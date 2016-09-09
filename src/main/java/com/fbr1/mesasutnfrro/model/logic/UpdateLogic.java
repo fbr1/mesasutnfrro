@@ -1,6 +1,5 @@
 package com.fbr1.mesasutnfrro.model.logic;
 
-import com.fbr1.mesasutnfrro.model.data.ApplicationVariablesData;
 import com.fbr1.mesasutnfrro.model.entity.ApplicationVariables;
 import com.fbr1.mesasutnfrro.model.entity.Llamado;
 import com.fbr1.mesasutnfrro.model.entity.Mesa;
@@ -12,6 +11,8 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -22,6 +23,7 @@ import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+@Service
 public class UpdateLogic {
 
     private static final long UPDATE_INTERVAL = 2160000; // An hour in milliseconds
@@ -74,7 +76,7 @@ public class UpdateLogic {
                 llamado.setDate(dateLlamado);
                 llamado.setMesas(mesas);
 
-                new LlamadosLogic().add(llamado);
+                llamadosLogic.add(llamado);
                 logger.info("New Llamado added | Año: "+ añoLlamado + " Numero: " + numeroLlamado);
 
             }catch (MalformedURLException urle){
@@ -119,8 +121,6 @@ public class UpdateLogic {
 
         // If crawling is successful
         if( crawl(CRAWLING_PAGE) ){
-
-            VisitedURLsLogic visitedURLsLogic = new VisitedURLsLogic();
 
             Set<String> processedURLs = visitedURLsLogic.getAll();
 
@@ -190,9 +190,7 @@ public class UpdateLogic {
 
         Long currentTime = System.currentTimeMillis();
 
-        ApplicationVariablesLogic appVarsLogic = new ApplicationVariablesLogic();
-
-        ApplicationVariables appVars = appVarsLogic.get();
+        ApplicationVariables appVars = applicationVariablesLogic.get();
 
         Long lastUpdate = appVars.getLastupdate();
 
@@ -200,7 +198,7 @@ public class UpdateLogic {
 
             // If it's the first execution of the webapp instance
             appVars.setLastupdate(currentTime);
-            appVarsLogic.update(appVars);
+            applicationVariablesLogic.update(appVars);
             return true;
 
         } else {
@@ -210,11 +208,20 @@ public class UpdateLogic {
             if (timeSinceLastUpdate > UPDATE_INTERVAL) {
                 // Update last update time
                 appVars.setLastupdate(currentTime);
-                appVarsLogic.update(appVars);
+                applicationVariablesLogic.update(appVars);
                 return true;
             }
         }
         return false;
 
     }
+
+    @Autowired
+    private ApplicationVariablesLogic applicationVariablesLogic;
+
+    @Autowired
+    private LlamadosLogic llamadosLogic;
+
+    @Autowired
+    private VisitedURLsLogic visitedURLsLogic;
 }

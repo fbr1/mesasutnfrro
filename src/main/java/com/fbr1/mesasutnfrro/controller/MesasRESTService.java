@@ -4,11 +4,15 @@ import java.util.List;
 
 import com.fbr1.mesasutnfrro.model.entity.Llamado;
 import com.fbr1.mesasutnfrro.model.logic.LlamadosLogic;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-
 
 @RestController
 public class MesasRESTService {
+
+    private final static Logger logger = LoggerFactory.getLogger(MesasRESTService.class);
 
     private final String baseRestUrl = "/rest";
 
@@ -16,7 +20,7 @@ public class MesasRESTService {
                     method= RequestMethod.GET)
     public Llamado getLastLlamado(@RequestParam(value="esp", defaultValue="ALL") String esp){
 
-        return new LlamadosLogic().getlastLlamado();
+        return llamadosLogic.getlastLlamado();
     }
 
     @RequestMapping(value= baseRestUrl + "/{year}",
@@ -24,7 +28,7 @@ public class MesasRESTService {
     public List<Llamado> getAllLlamadosOfYear(@PathVariable int year,
                                        @RequestParam(value="esp", defaultValue="ALL") String esp){
 
-        return new LlamadosLogic().getLlamadosOfYear(year);
+        return llamadosLogic.getLlamadosOfYear(year);
     }
 
     @RequestMapping(value= baseRestUrl + "/{year}/{numero}",
@@ -33,7 +37,11 @@ public class MesasRESTService {
                                    @PathVariable int numero,
                                    @RequestParam(value="esp", defaultValue="ALL") String esp){
 
-        return new LlamadosLogic().getLlamado(year,numero);
+        return llamadosLogic.getLlamado(year,numero);
     }
+
+    @Autowired
+    private LlamadosLogic llamadosLogic;
+
 
 }

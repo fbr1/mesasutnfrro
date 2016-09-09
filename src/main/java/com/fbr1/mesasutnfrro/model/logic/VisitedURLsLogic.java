@@ -1,36 +1,46 @@
 package com.fbr1.mesasutnfrro.model.logic;
 
-import com.fbr1.mesasutnfrro.model.data.VisitedURLsData;
+import com.fbr1.mesasutnfrro.model.data.VisitedURLsRepository;
+import com.fbr1.mesasutnfrro.model.entity.VisitedURL;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
+import java.util.HashSet;
 import java.util.Set;
 
+@Service
 public class VisitedURLsLogic {
 
-    private VisitedURLsData visitedURLsData;
     private final static Logger logger = LoggerFactory.getLogger(VisitedURLsLogic.class);
 
-    public VisitedURLsLogic(){
-        visitedURLsData = new VisitedURLsData();
-    }
-
     public Set<String> getAll(){
-        Set<String> visitedURLs= null;
+        Set<String> urlsStr = null;
         try{
-            visitedURLs =this.visitedURLsData.getAll();
+            urlsStr = new HashSet<>();
+            for(VisitedURL visitedURL : visitedURLsRepository.findAll()){
+                urlsStr.add(visitedURL.getUrl());
+            }
         }catch(Exception Ex){
             logger.error(Ex.getMessage(), Ex);
         }
-        return visitedURLs;
+        return urlsStr;
     }
 
-    public void addAll(Set<String> visitedURLs){
+    public void addAll(Set<String> urlsStr){
+        Set<VisitedURL> visitedURLs= new HashSet<>();
+        for(String url : urlsStr){
+            visitedURLs.add(new VisitedURL(url));
+        }
         try{
-            this.visitedURLsData.addAll(visitedURLs);
+            visitedURLsRepository.save(visitedURLs);
         }catch(Exception Ex){
             logger.error(Ex.getMessage(), Ex);
         }
     }
+
+    @Autowired
+    private VisitedURLsRepository visitedURLsRepository;
 
 }

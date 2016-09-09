@@ -1,25 +1,23 @@
 package com.fbr1.mesasutnfrro.model.logic;
 
-import com.fbr1.mesasutnfrro.model.data.LlamadosData;
+import com.fbr1.mesasutnfrro.model.data.LlamadosRepository;
 import com.fbr1.mesasutnfrro.model.entity.Llamado;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
 
+@Service
 public class LlamadosLogic {
-    private LlamadosData llamadosData;
-    private final static Logger logger = LoggerFactory.getLogger(VisitedURLsLogic.class);
 
-    public LlamadosLogic(){
-        llamadosData = new LlamadosData();
-    }
-
+    private final static Logger logger = LoggerFactory.getLogger(LlamadosLogic.class);
 
     public Llamado getLlamado(int year, int numero){
         Llamado llamado= null;
         try {
-            llamado = this.llamadosData.getLlamado(year,numero);
+            llamado = llamadosRepository.findByAñoAndNumero(year, numero);
         }catch(Exception Ex){
             logger.error(Ex.getMessage(), Ex);
         }
@@ -29,7 +27,7 @@ public class LlamadosLogic {
     public Llamado getlastLlamado(){
         Llamado llamado= null;
         try {
-            llamado = this.llamadosData.getlastLlamado();
+            llamado = llamadosRepository.findTopByOrderByDateDesc();
         }catch(Exception Ex){
             logger.error(Ex.getMessage(), Ex);
         }
@@ -39,7 +37,7 @@ public class LlamadosLogic {
     public List<Llamado> getLlamadosOfYear(int year){
         List<Llamado> llamados= null;
         try {
-            llamados = this.llamadosData.getLlamadosOfYear(year);
+            llamados = llamadosRepository.findByAño(year);
         }catch(Exception Ex){
             logger.error(Ex.getMessage(), Ex);
         }
@@ -49,7 +47,7 @@ public class LlamadosLogic {
     public List<Llamado> getAllLlamados(){
         List<Llamado> llamados= null;
         try {
-            llamados = this.llamadosData.getAll();
+            llamados = (List<Llamado>)llamadosRepository.findAll();
         }catch(Exception Ex){
             logger.error(Ex.getMessage(), Ex);
         }
@@ -58,9 +56,12 @@ public class LlamadosLogic {
 
     public void add(Llamado llamado){
         try{
-            this.llamadosData.add(llamado);
+            llamadosRepository.save(llamado);
         }catch(Exception Ex){
             logger.error(Ex.getMessage(), Ex);
         }
     }
+
+    @Autowired
+    private LlamadosRepository llamadosRepository;
 }

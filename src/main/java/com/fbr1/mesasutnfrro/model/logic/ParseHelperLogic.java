@@ -79,7 +79,7 @@ public class ParseHelperLogic {
             lines = textPart.split(System.getProperty("line.separator"));
             stringBuilder = new StringBuilder();
 
-            // Create helper and increment in 1 the depth
+            // Create helper and increment the depth by 1
             int depth = helper.getDepth() + 1;
             ParseHelper ph = new ParseHelper(depth);
 

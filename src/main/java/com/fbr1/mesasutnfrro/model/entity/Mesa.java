@@ -1,5 +1,8 @@
 package com.fbr1.mesasutnfrro.model.entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+
 import javax.persistence.*;
 
 import java.util.Date;
@@ -18,10 +21,12 @@ public class Mesa {
     private Date fecha;
 
     @OneToMany(mappedBy = "mesa", fetch = FetchType.EAGER, cascade={CascadeType.ALL})
+    @JsonManagedReference
     private List<Examen> examenes;
 
     @ManyToOne
     @JoinColumn(name = "id_llamado")
+    @JsonBackReference
     private Llamado llamado;
 
     public Mesa(Date fecha, List<Examen> examenes) {

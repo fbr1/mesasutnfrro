@@ -1,5 +1,7 @@
 package com.fbr1.mesasutnfrro.model.entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+
 import javax.persistence.*;
 import java.util.Date;
 
@@ -24,6 +26,7 @@ public class Examen {
 
     @ManyToOne
     @JoinColumn(name = "id_mesa")
+    @JsonBackReference
     private Mesa mesa;
 
     public Examen(Date fecha, String aula, Materia materia) {

@@ -1,6 +1,7 @@
 package com.fbr1.mesasutnfrro.model.entity;
 
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 
 import javax.persistence.*;
@@ -10,7 +11,6 @@ import java.util.List;
 
 @Entity
 @Table(name="llamados")
-@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
 public class Llamado{
 
     @Id
@@ -28,6 +28,7 @@ public class Llamado{
     private Date date;
 
     @OneToMany(mappedBy="llamado", fetch = FetchType.EAGER, cascade={CascadeType.ALL})
+    @JsonManagedReference
     private List<Mesa> mesas;
 
     public Llamado(int año, int numero, List<Mesa> mesas, Date date) {

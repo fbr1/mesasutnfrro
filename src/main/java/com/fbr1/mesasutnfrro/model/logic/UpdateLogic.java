@@ -26,7 +26,6 @@ import java.util.regex.Pattern;
 @Service
 public class UpdateLogic {
 
-    private static final long UPDATE_INTERVAL = 2160000; // An hour in milliseconds
     private static final String USER_AGENT =
             "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/535.1 (KHTML, like Gecko) Chrome/13.0.782.112 Safari/535.1";
     private static final String URL_SELECTOR = "a:containsOwn(ver listado)";
@@ -205,7 +204,7 @@ public class UpdateLogic {
 
             long timeSinceLastUpdate = currentTime - lastUpdate;
 
-            if (timeSinceLastUpdate > UPDATE_INTERVAL) {
+            if (timeSinceLastUpdate > appVars.getUpdateInteval()) {
                 // Update last update time
                 appVars.setLastupdate(currentTime);
                 applicationVariablesLogic.update(appVars);

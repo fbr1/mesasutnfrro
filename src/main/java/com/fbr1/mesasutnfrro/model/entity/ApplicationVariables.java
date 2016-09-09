@@ -13,8 +13,13 @@ public class ApplicationVariables {
     @Column(name = "id_application_vars")
     private int ID;
 
-    @Column(name = "lastUpdate")
+    @Column(name = "lastupdate")
     private Long lastupdate;
+
+    // Update interval in ms
+    // Maximum allowed is ~24 days, restricted by int max number and INT in the db
+    @Column(name = "updateinterval")
+    private int updateInterval;
 
     public ApplicationVariables(){}
 
@@ -32,5 +37,13 @@ public class ApplicationVariables {
 
     public void setLastupdate(Long lastupdate) {
         this.lastupdate = lastupdate;
+    }
+
+    public int getUpdateInteval() {
+        return updateInterval;
+    }
+
+    public void setUpdateInteval(int updateInteval) {
+        this.updateInterval = updateInteval;
     }
 }

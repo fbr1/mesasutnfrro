@@ -44,5 +44,5 @@ log/
 target/
 
 # Custom
-src/main/resources/app.properties
+src/main/resources/application.properties
 

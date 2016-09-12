@@ -28,7 +28,7 @@ public class UpdateLogic {
 
     private static final String USER_AGENT =
             "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/535.1 (KHTML, like Gecko) Chrome/13.0.782.112 Safari/535.1";
-    private static final String URL_SELECTOR = "a:containsOwn(ver listado)";
+    private static final String URL_SELECTOR = "a:contains(ver listado)";
     private static final String CRAWLING_PAGE = "http://www.frro.utn.edu.ar/contenido.php?cont=528&subc=5";
     private Set<String> urls = null;
     private final static Logger logger = LoggerFactory.getLogger(UpdateLogic.class);

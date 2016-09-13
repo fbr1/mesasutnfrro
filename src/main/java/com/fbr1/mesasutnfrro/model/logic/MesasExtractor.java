@@ -20,16 +20,34 @@ public class MesasExtractor {
     private static final Logger logger = LoggerFactory.getLogger(MesasExtractor.class);
 
     private int nroLlamado = 0;
-    private int año = 0;
+    private int añoLlamado = 0;
+    private String mesaDate = null;
+
+    private static final Map<String, String> monthsMap = new HashMap<>();
+    static{
+        monthsMap.put("ENERO","01");
+        monthsMap.put("FEBRERO","02");
+        monthsMap.put("MARZO","03");
+        monthsMap.put("ABRIL","04");
+        monthsMap.put("MAYO","05");
+        monthsMap.put("JUNIO","06");
+        monthsMap.put("JULIO","07");
+        monthsMap.put("AGOSTO","08");
+        monthsMap.put("SEPTIEMBRE","09");
+        monthsMap.put("SETIEMBRE","09");
+        monthsMap.put("OCTUBRE","10");
+        monthsMap.put("OTUBRE","10");
+        monthsMap.put("NOVIEMBRE","11");
+        monthsMap.put("DICIEMBRE","12");
+    }
 
     /**
      * Extracts a Mesa from the given pdf
      *
      * @param pdd - PDDocument pdf document containing Examanes
-     * @param dateStr - date String from the mesa in the format: (dd-MM-yy)
      * @return      Mesa extracted from the pdf document
      */
-    public Mesa processPDF(PDDocument pdd, String dateStr){
+    public Mesa processPDF(PDDocument pdd){
         Mesa mesa = null;
         try {
 
@@ -37,7 +55,7 @@ public class MesasExtractor {
             String text=cleanText(stripper.getText(pdd));
 
             pdd.close();
-            mesa = extractMesa(text, dateStr);
+            mesa = extractMesa(text, this.mesaDate);
         }
         catch(IOException ex) {
             logger.error(ex.getMessage(), ex);
@@ -59,7 +77,7 @@ public class MesasExtractor {
         String turnoRegex = "\\d-\\w\\p{L}+ ";
 
         // Regex for a year in the range 2000-2099
-        Pattern yearRegex = Pattern.compile("(20\\d{2})");
+        Pattern yearRegex = Pattern.compile("\\d{1,2} .*(\\d{4})");
 
         oriText = oriText.replaceAll(turnoRegex, "");
 
@@ -72,13 +90,16 @@ public class MesasExtractor {
             // Remove unnecessary lines
             if(line.contains("LLAMADO")){
                 if(nroLlamado == 0 ){
-                    nroLlamado = Integer.valueOf(line.substring(0,1));
+                    nroLlamado = Integer.valueOf(line.substring(0, 1));
                 }
 
                 line = "";
             }else if(matcher.find()){
-                if(año == 0){
-                    año = Integer.valueOf(matcher.group(1));
+
+                this.mesaDate = this.getDate(line);
+
+                if(añoLlamado == 0){
+                    añoLlamado = Integer.valueOf(matcher.group(1));
                 }
                 line = "";
             }else if(line.contains("DISTRIBUCION DE AULAS ") || line.contains("Horario")){
@@ -97,6 +118,26 @@ public class MesasExtractor {
         }
         return normalizeText(stringBuilder.toString());
     }
+    /**
+     * Extract date from the PDF date line
+     *
+     * @param line - line containing a dateRegex format
+     * @return      String with the Mesa's date in (yyyy-MM-dd) format
+     */
+    private String getDate(String line){
+        String day = null;
+        String month = null;
+        String year = null;
+        Pattern dateRegex = Pattern.compile("(?<day>\\d{1,2}) DE (?<month>.*) DE (?<year>\\d{4})");
+        Matcher matcher = dateRegex.matcher(line);
+        if(matcher.find()){
+            day = matcher.group("day");
+            month = MesasExtractor.monthsMap.get(matcher.group("month").toUpperCase());
+            year = matcher.group("year");
+        }
+        return year + "-" + month + "-" + day;
+    }
+
     /**
      * Normalizes an already cleaned text stripped from Examenes PDF.
      * Makes sure that every Especialidad, Aula and Examen is in its own line.
@@ -213,13 +254,13 @@ public class MesasExtractor {
      * Cast the normalized text into a Mesa Object
      *
      * @param text - text cleaned and normalized from the Examenes PDF
-     * @param dateStr - date String from the mesa in the format: (dd-MM-yy)
+     * @param dateStr - String from the Mesa's date in the format: (yyyy-MM-dd)
      * @return      Mesa object
      */
     private Mesa extractMesa(String text, String dateStr){
 
         // Transform date from String to Date
-        DateFormat mesaDateFormat = new SimpleDateFormat("dd-MM-yy");
+        DateFormat mesaDateFormat = new SimpleDateFormat("yyyy-MM-dd");
         Date mesaDate = new Date();
         try {
             mesaDate = mesaDateFormat.parse(dateStr);
@@ -246,7 +287,7 @@ public class MesasExtractor {
         return nroLlamado;
     }
 
-    public int getAño() {
-        return año;
+    public int getAñoLlamado() {
+        return añoLlamado;
     }
 }

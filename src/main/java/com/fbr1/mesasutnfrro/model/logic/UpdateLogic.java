@@ -35,7 +35,7 @@ public class UpdateLogic {
 
 
     /**
-     * If the urls hadn't already been seen,
+     * If the urls hasn't already been seen,
      * extracts the Llamado from the raw PDFs in the urls and saves it.
      *
      */
@@ -49,9 +49,6 @@ public class UpdateLogic {
 
                 for(String urlS : this.urls) {
 
-                    // Get date
-                    String date = getDateFromUrl(urlS);
-
                     // Get and open pdf
                     URL url = new URL(urlS);
                     HttpURLConnection connection = (HttpURLConnection) url.openConnection();
@@ -60,14 +57,14 @@ public class UpdateLogic {
                     connection.disconnect();
 
                     // Extract mesa
-                    Mesa mesa = mesasExtractor.processPDF(pdd, date);
+                    Mesa mesa = mesasExtractor.processPDF(pdd);
                     mesa.setLlamado(llamado);
                     mesas.add(mesa);
 
                 }
 
                 Date dateLlamado = mesas.get(0).getFecha();
-                int añoLlamado = mesasExtractor.getAño();
+                int añoLlamado = mesasExtractor.getAñoLlamado();
                 int numeroLlamado = mesasExtractor.getNroLlamado();
 
                 llamado.setAño(añoLlamado);
@@ -87,28 +84,6 @@ public class UpdateLogic {
             }
 
         }
-    }
-
-    /**
-     * Returns date String in the format:(dd-MM-yy) extracted from 'url'
-     *
-     * @param url - Url string to extract date
-     * @return      date extracted from url string
-     */
-    private String getDateFromUrl (String url) throws Exception{
-        Pattern p = Pattern.compile("(\\d{1,2}-\\d{1,2}-\\d{1,2})");
-        Matcher m = p.matcher(url);
-
-        String dateStr;
-
-        if (m.find()) {
-            dateStr = m.group(1);
-            System.out.println(m.group(1));
-        }else{
-            throw new Exception("The url: " + url + "doesn't have a date");
-        }
-
-        return dateStr;
     }
 
     /**

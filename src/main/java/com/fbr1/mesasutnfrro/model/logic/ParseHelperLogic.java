@@ -110,7 +110,7 @@ public class ParseHelperLogic {
      * @param especialidad - especialidad from the materia
      * @param aula - aula in which the examen is going to occur
      * @param examenStr - Materia's name and examen's hour
-     * @param dateStr - Mesa's date in string format (dd-MM-yy)
+     * @param dateStr - Mesa's date in string format (yyyy-MM-dd)
      * @return      Examen Object
      */
     private Examen buildExamen(String especialidad, String aula, String examenStr, String dateStr){
@@ -130,7 +130,7 @@ public class ParseHelperLogic {
         Materia materia = new Materia(materiaName, especialidad);
 
         // Transform hourStr from String to Date
-        DateFormat examenDateFormat = new SimpleDateFormat("dd-MM-yy HH:mm:ss");
+        DateFormat examenDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         examenDateFormat.setTimeZone(TimeZone.getTimeZone("America/Argentina/Buenos_Aires"));
 
         if(hourStr.length() < HOUR_STR_LENGHT ){

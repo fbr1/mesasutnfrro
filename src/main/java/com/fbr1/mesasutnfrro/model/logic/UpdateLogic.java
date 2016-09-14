@@ -36,54 +36,40 @@ public class UpdateLogic {
 
     /**
      * If the urls hasn't already been seen,
-     * extracts the Llamado from the raw PDFs in the urls and saves it.
+     * extracts the Llamado from the raw PDFs in the URLs and saves it.
      *
      */
-    public void checkUpdates(){
+    public void checkUpdates() throws IOException{
         if(isContentNew()){
 
-            try{
-                List<Mesa> mesas = new ArrayList<>();
-                MesasExtractor mesasExtractor = new MesasExtractor();
-                Llamado llamado = new Llamado();
+            updateLlamadosFromURLs(this.urls);
 
-                for(String urlS : this.urls) {
-
-                    // Get and open pdf
-                    URL url = new URL(urlS);
-                    HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-                    InputStream is = connection.getInputStream();
-                    PDDocument pdd = PDDocument.load(is);
-                    connection.disconnect();
-
-                    // Extract mesa
-                    Mesa mesa = mesasExtractor.processPDF(pdd);
-                    mesa.setLlamado(llamado);
-                    mesas.add(mesa);
-
-                }
-
-                Date dateLlamado = mesas.get(0).getFecha();
-                int añoLlamado = mesasExtractor.getAñoLlamado();
-                int numeroLlamado = mesasExtractor.getNroLlamado();
-
-                llamado.setAño(añoLlamado);
-                llamado.setNumero(numeroLlamado);
-                llamado.setDate(dateLlamado);
-                llamado.setMesas(mesas);
-
-                llamadosLogic.add(llamado);
-                logger.info("New Llamado added | Año: "+ añoLlamado + " Numero: " + numeroLlamado);
-
-            }catch (MalformedURLException urle){
-                logger.error(urle.getMessage(), urle);
-            }catch (IOException ioe){
-                logger.error(ioe.getMessage(), ioe);
-            }catch (Exception e){
-                logger.error(e.getMessage(), e);
-            }
-
+            // If all went well, store used URLs
+            visitedURLsLogic.addAll(this.urls);
+            logger.info("Add URLs: ", this.urls);
         }
+    }
+
+    public void updateLlamadosFromURLs(Set<String> urls) throws IOException{
+        List<Mesa> mesas = new ArrayList<>();
+        MesasExtractor mesasExtractor = new MesasExtractor();
+
+        for(String urlS : urls) {
+            // Get and open pdf
+            URL url = new URL(urlS);
+            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+
+            try(InputStream is = connection.getInputStream()){
+
+                PDDocument pdd = PDDocument.load(is);
+
+                // Extract mesa
+                Mesa mesa = mesasExtractor.processPDF(pdd);
+                mesas.add(mesa);
+            }
+        }
+
+        llamadosLogic.buildAndAdd(mesas, mesasExtractor.getAñoLlamado(), mesasExtractor.getNroLlamado());
     }
 
     /**
@@ -99,8 +85,6 @@ public class UpdateLogic {
             Set<String> processedURLs = visitedURLsLogic.getAll();
 
             if(!this.urls.isEmpty() && !processedURLs.containsAll(this.urls)){
-                visitedURLsLogic.addAll(this.urls);
-                logger.info("Add URLs: ", this.urls);
                 return true;
             }else{
                 logger.info("URLs already seen");
@@ -156,7 +140,7 @@ public class UpdateLogic {
 
     /**
      * Returns true if enough time has passed for a new update to be allowed.
-     * The time required is set on the constant UPDATE_INTERVAL
+     * The time required is set on a ApplicationVariables object
      *
      * @return      whether is time or not for an update
      */

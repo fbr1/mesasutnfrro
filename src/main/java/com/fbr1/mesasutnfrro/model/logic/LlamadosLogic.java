@@ -1,6 +1,7 @@
 package com.fbr1.mesasutnfrro.model.logic;
 
 import com.fbr1.mesasutnfrro.model.data.LlamadosRepository;
+import com.fbr1.mesasutnfrro.model.entity.Mesa;
 import com.fbr1.mesasutnfrro.model.entity.Llamado;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -60,6 +61,26 @@ public class LlamadosLogic {
         }catch(Exception Ex){
             logger.error(Ex.getMessage(), Ex);
         }
+    }
+
+    /**
+     * Builds and adds a Llamado from a list of Mesa objects
+     *
+     * @param mesas - List containing Mesa objects
+     * @param añoLlamado - Int
+     * @param numeroLlamado - Int
+     */
+    public void buildAndAdd(List<Mesa> mesas,int añoLlamado, int numeroLlamado){
+
+        Llamado llamado = new Llamado(añoLlamado, numeroLlamado, mesas.get(0).getFecha());
+
+        for(Mesa mesa : mesas){
+            mesa.setLlamado(llamado);
+        }
+
+        llamado.setMesas(mesas);
+
+        this.add(llamado);
     }
 
     @Autowired

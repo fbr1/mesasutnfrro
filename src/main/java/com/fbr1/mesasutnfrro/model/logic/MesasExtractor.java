@@ -47,27 +47,21 @@ public class MesasExtractor {
      * @param pdd - PDDocument pdf document containing Examanes
      * @return      Mesa extracted from the pdf document
      */
-    public Mesa processPDF(PDDocument pdd){
-        Mesa mesa = null;
-        try {
+    public Mesa processPDF(PDDocument pdd) throws IOException{
 
-            PDFTextStripper stripper = new PDFTextStripper();
-            String text=cleanText(stripper.getText(pdd));
+        PDFTextStripper stripper = new PDFTextStripper();
+        String text=cleanText(stripper.getText(pdd));
+        
+        pdd.close();
 
-            pdd.close();
-            mesa = extractMesa(text, this.mesaDate);
-        }
-        catch(IOException ex) {
-            logger.error(ex.getMessage(), ex);
-        }
-        return mesa;
+        return extractMesa(text, this.mesaDate);
     }
 
     /**
-     * Cleans and normalizes the text stripped from the Examanes pdf
+     * Cleans and normalizes the text stripped from the Mesa pdf
      * The goal of this is to have a uniform format from which later it can be casted into objects
      *
-     * @param oriText - Text stripped from the Examenes PDF
+     * @param oriText - Text stripped from the Mesa PDF
      * @return      String containing an uniform format of Examanes
      */
     public String cleanText(String oriText){
@@ -139,10 +133,10 @@ public class MesasExtractor {
     }
 
     /**
-     * Normalizes an already cleaned text stripped from Examenes PDF.
+     * Normalizes an already cleaned text stripped from Mesa PDF.
      * Makes sure that every Especialidad, Aula and Examen is in its own line.
      *
-     * @param text - text cleaned from the Examenes PDF
+     * @param text - text cleaned from the Mesa PDF
      * @return      String containing an normalized format of Examanes
      */
     private String normalizeText(String text){

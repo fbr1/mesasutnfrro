@@ -1,11 +1,8 @@
 package com.fbr1.mesasutnfrro.model.entity;
 
-import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
-import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 
 import javax.persistence.*;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -31,10 +28,16 @@ public class Llamado{
     @JsonManagedReference
     private List<Mesa> mesas;
 
-    public Llamado(int año, int numero, List<Mesa> mesas, Date date) {
+    public Llamado(int año, int numero, Date date, List<Mesa> mesas) {
         this.año = año;
         this.numero = numero;
         this.mesas = mesas;
+        this.date = date;
+    }
+
+    public Llamado(int año, int numero, Date date) {
+        this.año = año;
+        this.numero = numero;
         this.date = date;
     }
 

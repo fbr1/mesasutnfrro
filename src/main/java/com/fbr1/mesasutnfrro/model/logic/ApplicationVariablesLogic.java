@@ -13,23 +13,11 @@ public class ApplicationVariablesLogic {
     private final static Logger logger = LoggerFactory.getLogger(ApplicationVariablesLogic.class);
 
     public ApplicationVariables get(){
-        ApplicationVariables applicationVariables= null;
-        try{
-            applicationVariables = applicationVariablesRepository.findTop();
-        }catch(Exception Ex){
-            logger.error(Ex.getMessage(), Ex);
-        }
-        return applicationVariables;
+        return applicationVariablesRepository.findTop();
     }
 
     public void update(ApplicationVariables applicationVariables){
-        try{
-
-            applicationVariablesRepository.save(applicationVariables);
-
-        }catch(Exception Ex){
-            logger.error(Ex.getMessage(), Ex);
-        }
+        applicationVariablesRepository.save(applicationVariables);
     }
 
     @Autowired

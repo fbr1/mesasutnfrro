@@ -16,15 +16,13 @@ public class VisitedURLsLogic {
     private final static Logger logger = LoggerFactory.getLogger(VisitedURLsLogic.class);
 
     public Set<String> getAll(){
-        Set<String> urlsStr = null;
-        try{
-            urlsStr = new HashSet<>();
-            for(VisitedURL visitedURL : visitedURLsRepository.findAll()){
-                urlsStr.add(visitedURL.getUrl());
-            }
-        }catch(Exception Ex){
-            logger.error(Ex.getMessage(), Ex);
+        Set<String> urlsStr;
+
+        urlsStr = new HashSet<>();
+        for(VisitedURL visitedURL : visitedURLsRepository.findAll()){
+            urlsStr.add(visitedURL.getUrl());
         }
+
         return urlsStr;
     }
 
@@ -33,11 +31,8 @@ public class VisitedURLsLogic {
         for(String url : urlsStr){
             visitedURLs.add(new VisitedURL(url));
         }
-        try{
-            visitedURLsRepository.save(visitedURLs);
-        }catch(Exception Ex){
-            logger.error(Ex.getMessage(), Ex);
-        }
+
+        visitedURLsRepository.save(visitedURLs);
     }
 
     @Autowired

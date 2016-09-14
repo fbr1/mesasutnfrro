@@ -21,43 +21,19 @@ public class LlamadosLogic {
     private final static Logger logger = LoggerFactory.getLogger(LlamadosLogic.class);
 
     public Llamado getLlamado(int year, int numero){
-        Llamado llamado= null;
-        try {
-            llamado = llamadosRepository.findByAñoAndNumero(year, numero);
-        }catch(Exception Ex){
-            logger.error(Ex.getMessage(), Ex);
-        }
-        return llamado;
+        return llamadosRepository.findByAñoAndNumero(year, numero);
     }
 
     public Llamado getlastLlamado(){
-        Llamado llamado= null;
-        try {
-            llamado = llamadosRepository.findTopByOrderByDateDesc();
-        }catch(Exception Ex){
-            logger.error(Ex.getMessage(), Ex);
-        }
-        return llamado;
+        return llamadosRepository.findTopByOrderByDateDesc();
     }
 
     public List<Llamado> getLlamadosOfYear(int year){
-        List<Llamado> llamados= null;
-        try {
-            llamados = llamadosRepository.findByAño(year);
-        }catch(Exception Ex){
-            logger.error(Ex.getMessage(), Ex);
-        }
-        return llamados;
+        return llamadosRepository.findByAño(year);
     }
 
     public List<Llamado> getAllLlamados(){
-        List<Llamado> llamados= null;
-        try {
-            llamados = (List<Llamado>)llamadosRepository.findAll();
-        }catch(Exception Ex){
-            logger.error(Ex.getMessage(), Ex);
-        }
-        return llamados;
+        return (List<Llamado>)llamadosRepository.findAll();
     }
 
     /**

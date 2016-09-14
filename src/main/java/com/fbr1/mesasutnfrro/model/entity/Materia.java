@@ -1,17 +1,10 @@
 package com.fbr1.mesasutnfrro.model.entity;
 
-import com.fasterxml.jackson.annotation.JsonIdentityInfo;
-import com.fasterxml.jackson.annotation.ObjectIdGenerators;
-
 import javax.persistence.*;
 
 @Entity
 @Table(name="materias")
 public class Materia {
-
-    public enum Especialidades {
-        ISI,IC,IQ,IM,IE
-    }
 
     @Id
     @GeneratedValue(strategy= GenerationType.IDENTITY)
@@ -30,6 +23,25 @@ public class Materia {
     }
 
     public Materia () {} // Required for json parser
+
+    @Override
+    public int hashCode() {
+        int result = nombre.hashCode();
+        result = 31 * result + especialidad.hashCode();
+        return result;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        Materia materia = (Materia) o;
+
+        if (!nombre.equals(materia.nombre)) return false;
+        return especialidad.equals(materia.especialidad);
+
+    }
 
     public int getID() {
         return ID;

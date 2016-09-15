@@ -1,10 +1,10 @@
 # mesasutnfrro
 ## Configuration
-Edit the following properties in /src/main/resources/application.properties
+Set the following Environmental Variables:
 
-* spring.datasource.url
-* spring.datasource.username
-* spring.datasource.password
+* DB_URL
+* DB_USER
+* DB_PASS
 
 ## Requirements
 * Java SDK 1.8

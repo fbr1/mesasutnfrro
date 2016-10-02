@@ -51,7 +51,7 @@ function Examen(data) {
     }, self, {deferEvaluation: true});
 
     self.fechaFormateada = ko.computed(function () {
-        return formatearFechaHora(this.fecha());
+        return formatearHora(this.fecha());
     }, self);
 }
 
@@ -150,14 +150,20 @@ function getDia(dayNumber) {
 
 function formatearFecha(milisegundos) {
     var fecha = new Date(milisegundos);
-    var salida = getDia(fecha.getDay()) + ' ' +fecha.getDate() + '/' + fecha.getMonth() + '/' + fecha.getFullYear();
+    var salida = getDia(fecha.getDay()) + ' ' +fecha.getDate() + '/' + (fecha.getMonth()+1) + '/' + fecha.getFullYear();
     return salida;
 }
 
 function formatearFechaHora(milisegundos) {
     var fecha = new Date(milisegundos);
-    var salida = fecha.getDate() + '/' + fecha.getMonth() + '/' + fecha.getFullYear();
+    var salida = fecha.getDate() + '/' + (fecha.getMonth()+1) + '/' + fecha.getFullYear();
     salida += ' ' + fecha.getHours() + ':'
+            + (fecha.getMinutes() < 10 ? fecha.getMinutes() + '0' : fecha.getMinutes());
+    return salida;
+}
+function formatearHora(milisegundos) {
+    var fecha = new Date(milisegundos);
+    salida = fecha.getHours() + ':'
             + (fecha.getMinutes() < 10 ? fecha.getMinutes() + '0' : fecha.getMinutes());
     return salida;
 }

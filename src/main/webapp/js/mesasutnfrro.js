@@ -24,85 +24,75 @@ var mapping = {
     }
 };
 
-function obtenerData() {
-    return {
-        "id": 3,
-        "anio": 2015,
-        "numero": 8,
-        "mesas": [{
-                "fecha": 1441231200000,
-                "examenes": [{
-                        "fecha": 1441285230000,
-                        "aula": "234",
-                        "materia": {
-                            "id": 2,
-                            "nombre": "Ingenieria y sociedad 2015 2",
-                            "especialidad": "ISI"
-                        },
-                        "id": 3
-                    }, {
-                        "fecha": 1441299600000,
-                        "aula": "333",
-                        "materia": {
-                            "id": 3,
-                            "nombre": "Fisica 2015 2",
-                            "especialidad": "ISI"
-                        },
-                        "id": 4
-                    }, {
-                        "fecha": 1441292400000,
-                        "aula": "321",
-                        "materia": {
-                            "id": 5,
-                            "nombre": "Circuitos y electricidad 2015 2",
-                            "especialidad": "IC"
-                        },
-                        "id": 5
-                    }
-                ],
-                "llamado": 3,
-                "id": 3
-            }, {
-                "fecha": 1441144800000,
-                "examenes": [{
-                        "fecha": 1441378800000,
-                        "aula": "334",
-                        "materia": {
-                            "id": 6,
-                            "nombre": "Algoritmos 2015 2 Mesa 4",
-                            "especialidad": "ISI"
-                        },
-                        "id": 6
-                    }
-                ],
-                "llamado": 3,
-                "id": 4
-            }
-        ]
-    };
+function getDia(dayNumber) {
+    var weekday = new Array(7);
+    weekday[0] = "Domingo";
+    weekday[1] = "Lunes";
+    weekday[2] = "Martes";
+    weekday[3] = "Miércoles";
+    weekday[4] = "Jueves";
+    weekday[5] = "Viernes";
+    weekday[6] = "Sábado";
+
+    return weekday[dayNumber];
 }
+
 function formatearFecha(milisegundos) {
     var fecha = new Date(milisegundos);
-    return (fecha.getDay() + '/' + fecha.getMonth() + '/' + fecha.getFullYear());
+    var salida = getDia(fecha.getDay()) + ' ' +fecha.getDate() + '/' + fecha.getMonth() + '/' + fecha.getFullYear();
+    return salida;
+}
+
+function formatearFechaHora(milisegundos) {
+    var fecha = new Date(milisegundos);
+    var salida = fecha.getDate() + '/' + fecha.getMonth() + '/' + fecha.getFullYear();
+    salida += ' ' + fecha.getHours() + ':'
+            + (fecha.getMinutes() < 10 ? fecha.getMinutes() + '0' : fecha.getMinutes());
+    return salida;
 }
 
 function Examen(data) {
     var self = this;
     ko.mapping.fromJS(data, mapping, self);
-    
+        
     self.pasaFiltros = ko.computed(function() {
+        var pasaFiltroEspecialidad = function(especialidad) {
+            return especialidad === self.materia.especialidad() 
+                    || especialidad === "" 
+                    || especialidad === undefined;
+        };
+        var pasaFiltroMateria = function(materia) {
+            
+            var materiaEspecialidad = self.materia.nombre();
+            if (materiaEspecialidad !== undefined) {
+                materiaEspecialidad = materiaEspecialidad.toLowerCase();
+            }
+            m = materia;
+            if (materia !== undefined) {
+                m = materia.toLowerCase();
+            }
+            var coincide = materiaEspecialidad.indexOf(m) >= 0;
+            return  coincide || m === undefined || m === "";
+        };
         var e = viewModel.filtroEspecialidad();
-        return e === self.materia.especialidad() || e === "" || e === undefined;
+        var m = viewModel.filtroMateria();
+        return pasaFiltroEspecialidad(e) && pasaFiltroMateria(m);
     }, self, {deferEvaluation: true});
 
     self.fechaFormateada = ko.computed(function () {
-        return formatearFecha(this.fecha());
+        return formatearFechaHora(this.fecha());
     }, self);
 }
 
 function Mesa(data) {
     var self = this;
     ko.mapping.fromJS(data, mapping, self);
+    
+    self.examenesFiltrados = ko.computed(function() {
+        return self.examenes().filter(function(examen) {
+            return examen.pasaFiltros();
+        });
+    }, self, {deferEvaluation: true});
     
     self.fechaFormateada = ko.computed(function () {
         return formatearFecha(this.fecha());
@@ -116,9 +106,16 @@ function ViewModel(data, options) {
     
     self.filtroEspecialidad = ko.observable();
     
-    self.aplicarFiltros = function() {
+    self.aplicarFiltroEspecialidad = function() {
         var especialidad = $("#filtroEspecialidad").val();
         self.filtroEspecialidad(especialidad);
+    };
+    
+    self.filtroMateria = ko.observable();
+    
+    self.aplicarFiltroMateria = function () {
+        var materia = $('filtroMateria').val();
+        self.filtroMateria(materia);
     };
     
     self.mesas = self.mesas.sort(function(left, right) {
@@ -129,7 +126,23 @@ function ViewModel(data, options) {
 
 $(document).ready(function () {
     iniMaterialThings();
-    data = obtenerData();
-    viewModel = new ViewModel(data, mapping);
-    ko.applyBindings(viewModel);
+    var settings = {
+        url: "/rest",
+        dataType: "json",
+        beforeSend: function(jqXHR, settings) {
+            
+        },
+        success: function(data, status, jqXHR) {
+            viewModel = new ViewModel(data, mapping);
+            ko.applyBindings(viewModel);
+        },
+        error: function(jqXHR, status, error) {
+            alert("Ocurrio un error al obtener los datos" + error.toString());
+        },
+        complete: function(jqXHR, status) {
+            
+        }
+    }; 
+    $.ajax(settings);
+    
 });

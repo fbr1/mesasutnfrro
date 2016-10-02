@@ -33,14 +33,14 @@
             <section id="contenido">
                 <div class="card light-blue">
                     <div class="card-content white-text">
-                        <span class="card-title" data-bind="text: 'Llamado a examen número ' + numero() + '. Año ' + anio()"></span>
+                        <span class="card-title" data-bind="text: 'Llamado a examen número ' + numero() + '. Año ' + año()"></span>
 
                     </div>
-                    <div class="right-align card-action">
+                    <div class="card-action">
                         <div id="filtros" class="row">
                             <div class="input-field col s12 m3" >
-                                <select id="filtroEspecialidad">
-									<option value="" selected>Todas</option>
+                                <select id="filtroEspecialidad" data-bind="event: {change: aplicarFiltroEspecialidad}">
+                                    <option value="" selected>Todas</option>
                                     <option value="ISI">Ingeniería en sistemas</option>
                                     <option value="IQ">Ingeniería química</option>
                                     <option value="IM">Ingeniería mecánica</option>
@@ -49,14 +49,18 @@
                                 </select>
                                 <label>Especialidad</label>
                             </div>
+                            <div class="input-field col s12 m3">
+                                <input placeholder="Comience a escribir..." id="filtroMateria" type="text" class="validate" data-bind="textInput: $root.filtroMateria">
+                                <label for="filtroMateria">Materia</label>
+                            </div>
                         </div>
-                        <a class="waves-effect waves-light btn" href="#" data-bind="click: aplicarFiltros">Aplicar filtros</a>
                     </div>
                 </div>
                 <div id="mesas" data-bind="foreach: mesas">
+                    <!--ko if: examenesFiltrados().length > 0-->
                     <ul class="collection with-header">
                         <li class="collection-header">
-                            <h3>Mesa dia <span data-bind="text: fechaFormateada()"></span></h3>
+                            <h3>Mesa día <span data-bind="text: fechaFormateada()"></span></h3>
                         </li>
 
                         <li class="collection-item">
@@ -69,7 +73,7 @@
                                     </tr>
                                 </thead>
 
-                                <tbody data-bind="foreach: examenes">
+                                <tbody data-bind="foreach: examenesFiltrados">
                                     <tr data-bind="visible: pasaFiltros()">
                                         <td data-bind="text: materia.nombre()"></td>
                                         <td data-bind="text: aula()"></td>
@@ -79,6 +83,7 @@
                             </table>
                         </li>
                     </ul>
+                    <!--/ko-->
                 </div>
             </section>
         </div>

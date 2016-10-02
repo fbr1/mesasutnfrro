@@ -57,6 +57,10 @@
                                 <label for="filtroMateria">Materia</label>
                             </div>
                         </div>
+                        <div class="chip" data-bind="text: filtroEspecialidad().especialidad, visible : filtroEspecialidad()">
+                        </div>
+                        <div class="chip" data-bind='text: filtroMateria(), visible: filtroMateria()'>
+                        </div>
                     </div>
                 </div>
                 <div id="loader">

@@ -39,7 +39,10 @@
                     <div class="card-action">
                         <div id="filtros" class="row">
                             <div class="input-field col s12 m3" >
-                                <select id="filtroEspecialidad" data-bind="event: {change: aplicarFiltroEspecialidad}">
+                                <select id="filtroEspecialidad" data-bind="options: opcionesEspecialidad,
+                                            optionsText:  function(item) {return item.especialidad;},
+                                            value: filtroEspecialidad,
+                                            event: {change: setCookieEspecialidad}">
                                     <option value="" selected>Todas</option>
                                     <option value="ISI">Ingeniería en sistemas</option>
                                     <option value="IQ">Ingeniería química</option>
@@ -66,7 +69,7 @@
                 </div>
                 <div id="mesas" data-bind="foreach: mesas, visible: mesas().length > 0" style="display: none">
                     <!--ko if: examenesFiltrados().length > 0-->
-                    <ul class="collection with-header">
+                    <ul class="collection with-header z-depth-2">
                         <li class="collection-header">
                             <h3>Mesa día <span data-bind="text: fechaFormateada()"></span></h3>
                         </li>
@@ -76,6 +79,7 @@
                                 <thead>
                                     <tr>
                                         <th data-field="materia">Materia</th>
+                                        <th data-field="especialidad">Especialidad</th>
                                         <th data-field="aula">Aula</th>
                                         <th data-field="fecha">Fecha</th>
                                     </tr>
@@ -84,6 +88,7 @@
                                 <tbody data-bind="foreach: examenesFiltrados">
                                     <tr data-bind="visible: pasaFiltros()">
                                         <td data-bind="text: materia.nombre()"></td>
+                                        <td data-bind="text: materia.especialidad()"></td>
                                         <td data-bind="text: aula()"></td>
                                         <td data-bind="text: fechaFormateada()"></td>
                                     </tr>
@@ -101,6 +106,7 @@
         <script type="text/javascript" src="js/ko.js"></script>
         <script type="text/javascript" src="js/knockout.mapping-latest.debug.js"></script>
         <script type="text/javascript" src="js/jquery.mark.min.js"></script>
+        <script type="text/javascript" src="js/jquery.cookie.js"></script>
         <script type="text/javascript" src="js/mesasutnfrro.js"></script>
     </body>
 </html>

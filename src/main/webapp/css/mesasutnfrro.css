@@ -105,3 +105,8 @@ mark{
     color: black;
 }
 /* FIN Mark*/
+/* INICIO especificos */
+#mesas > ul {
+    margin-bottom: 1.5rem;
+}
+/* FIN especificos */

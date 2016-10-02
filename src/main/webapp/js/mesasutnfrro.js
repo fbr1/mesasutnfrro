@@ -1,22 +1,6 @@
 var viewModel;
 
-function iniMaterialThings() {
-    $(".button-collapse").sideNav();
-	$('select').material_select();
-}
 
-function  iniMarkThings() {
-    $('#filtroMateria').on("input", function() {
-        var self = $(this);
-        var materia =  self.val();
-        var $mesas = $('#mesas');
-        $mesas.unmark();
-        if (materia.length > 1) {
-            $mesas.mark(materia);
-        }
-        
-    });
-}
 
 var mapping = {
     'mesas': {
@@ -37,33 +21,6 @@ var mapping = {
     }
 };
 
-function getDia(dayNumber) {
-    var weekday = new Array(7);
-    weekday[0] = "Domingo";
-    weekday[1] = "Lunes";
-    weekday[2] = "Martes";
-    weekday[3] = "Miércoles";
-    weekday[4] = "Jueves";
-    weekday[5] = "Viernes";
-    weekday[6] = "Sábado";
-
-    return weekday[dayNumber];
-}
-
-function formatearFecha(milisegundos) {
-    var fecha = new Date(milisegundos);
-    var salida = getDia(fecha.getDay()) + ' ' +fecha.getDate() + '/' + fecha.getMonth() + '/' + fecha.getFullYear();
-    return salida;
-}
-
-function formatearFechaHora(milisegundos) {
-    var fecha = new Date(milisegundos);
-    var salida = fecha.getDate() + '/' + fecha.getMonth() + '/' + fecha.getFullYear();
-    salida += ' ' + fecha.getHours() + ':'
-            + (fecha.getMinutes() < 10 ? fecha.getMinutes() + '0' : fecha.getMinutes());
-    return salida;
-}
-
 function Examen(data) {
     var self = this;
     ko.mapping.fromJS(data, mapping, self);
@@ -71,6 +28,7 @@ function Examen(data) {
     self.pasaFiltros = ko.computed(function() {
         var pasaFiltroEspecialidad = function(especialidad) {
             return especialidad === self.materia.especialidad() 
+                    || especialidad === "ALL"
                     || especialidad === "" 
                     || especialidad === undefined;
         };
@@ -87,7 +45,7 @@ function Examen(data) {
             var coincide = materiaEspecialidad.indexOf(m) >= 0;
             return  coincide || m === undefined || m === "";
         };
-        var e = viewModel.filtroEspecialidad();
+        var e = viewModel.filtroEspecialidad().id;
         var m = viewModel.filtroMateria();
         return pasaFiltroEspecialidad(e) && pasaFiltroMateria(m);
     }, self, {deferEvaluation: true});
@@ -114,14 +72,39 @@ function Mesa(data) {
 
 function ViewModel(data, options) {
     var self = this;
+    var getEspecialidad = function() {
+        var especialidad = "ALL";
+        var especialidadFromCookie = $.cookie("especialidad");
+        if (especialidadFromCookie !== undefined) {
+            especialidad = self.opcionesEspecialidad().find(function(esp) {
+                return esp.id === especialidadFromCookie;
+            });
+            $('#filtroEspecialidad').siblings("input[type='text']").val(especialidad.especialidad);
+        }
+        return especialidad;
+    };
+    
     
     ko.mapping.fromJS(data, options, self);
     
-    self.filtroEspecialidad = ko.observable();
+    self.opcionesEspecialidad = ko.observableArray([
+        { id: "ALL", especialidad : "Todas"},
+        { id: "ISI" , especialidad: "Ingeniería en sistemas"},
+        { id: "IQ" , especialidad: "Ingeniería química"},
+        { id: "IM" , especialidad: "Ingeniería mecánica"},
+        { id: "IC" , especialidad: "Ingeniería civil"},
+        { id: "IE" , especialidad: "Ingeniería eléctrica"}
+    ]);
     
-    self.aplicarFiltroEspecialidad = function() {
-        var especialidad = $("#filtroEspecialidad").val();
-        self.filtroEspecialidad(especialidad);
+    self.filtroEspecialidad = ko.observable(getEspecialidad());
+    
+    self.setCookieEspecialidad = function() {
+        var especialidad = self.filtroEspecialidad().id;
+        if (especialidad === "" || especialidad === undefined) {
+            $.removeCookie("especialidad");
+        } else {
+            $.cookie("especialidad", especialidad, { expires : 30}); //Expira en 30 días
+        }
     };
     
     self.filtroMateria = ko.observable();
@@ -130,6 +113,53 @@ function ViewModel(data, options) {
         return left.fecha() > right.fecha() ? 1 : -1;
     });
     
+}
+
+//Fin viewmodel
+
+function iniMaterialThings() {
+    $(".button-collapse").sideNav();
+	$('select').material_select();
+}
+
+function  iniMarkThings() {
+    $('#filtroMateria').on("input", function() {
+        var self = $(this);
+        var materia =  self.val();
+        var $mesas = $('#mesas');
+        $mesas.unmark();
+        if (materia.length > 1) {
+            $mesas.mark(materia);
+        }
+        
+    });
+}
+
+function getDia(dayNumber) {
+    var weekday = new Array(7);
+    weekday[0] = "Domingo";
+    weekday[1] = "Lunes";
+    weekday[2] = "Martes";
+    weekday[3] = "Miércoles";
+    weekday[4] = "Jueves";
+    weekday[5] = "Viernes";
+    weekday[6] = "Sábado";
+
+    return weekday[dayNumber];
+}
+
+function formatearFecha(milisegundos) {
+    var fecha = new Date(milisegundos);
+    var salida = getDia(fecha.getDay()) + ' ' +fecha.getDate() + '/' + fecha.getMonth() + '/' + fecha.getFullYear();
+    return salida;
+}
+
+function formatearFechaHora(milisegundos) {
+    var fecha = new Date(milisegundos);
+    var salida = fecha.getDate() + '/' + fecha.getMonth() + '/' + fecha.getFullYear();
+    salida += ' ' + fecha.getHours() + ':'
+            + (fecha.getMinutes() < 10 ? fecha.getMinutes() + '0' : fecha.getMinutes());
+    return salida;
 }
 
 $(document).ready(function () {

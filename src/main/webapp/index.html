@@ -56,7 +56,15 @@
                         </div>
                     </div>
                 </div>
-                <div id="mesas" data-bind="foreach: mesas">
+                <div id="loader">
+                    <div class="loader">
+                        <span class="dot dot_1"></span>
+                        <span class="dot dot_2"></span>
+                        <span class="dot dot_3"></span>
+                        <span class="dot dot_4"></span>
+                    </div>
+                </div>
+                <div id="mesas" data-bind="foreach: mesas, visible: mesas().length > 0" style="display: none">
                     <!--ko if: examenesFiltrados().length > 0-->
                     <ul class="collection with-header">
                         <li class="collection-header">

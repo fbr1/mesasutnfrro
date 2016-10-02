@@ -130,7 +130,7 @@ $(document).ready(function () {
         url: "/rest",
         dataType: "json",
         beforeSend: function(jqXHR, settings) {
-            
+            $("#loader").show();
         },
         success: function(data, status, jqXHR) {
             viewModel = new ViewModel(data, mapping);
@@ -140,7 +140,7 @@ $(document).ready(function () {
             alert("Ocurrio un error al obtener los datos" + error.toString());
         },
         complete: function(jqXHR, status) {
-            
+            $("#loader").hide();
         }
     }; 
     $.ajax(settings);

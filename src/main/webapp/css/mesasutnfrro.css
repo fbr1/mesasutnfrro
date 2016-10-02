@@ -99,3 +99,9 @@
   }
 }
 /* FIN Loader*/
+/* INICIO Mark*/
+mark{
+    background: orange;
+    color: black;
+}
+/* FIN Mark*/

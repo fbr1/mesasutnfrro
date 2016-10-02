@@ -5,6 +5,19 @@ function iniMaterialThings() {
 	$('select').material_select();
 }
 
+function  iniMarkThings() {
+    $('#filtroMateria').on("input", function() {
+        var self = $(this);
+        var materia =  self.val();
+        var $mesas = $('#mesas');
+        $mesas.unmark();
+        if (materia.length > 1) {
+            $mesas.mark(materia);
+        }
+        
+    });
+}
+
 var mapping = {
     'mesas': {
         key: function (data) {
@@ -113,11 +126,6 @@ function ViewModel(data, options) {
     
     self.filtroMateria = ko.observable();
     
-    self.aplicarFiltroMateria = function () {
-        var materia = $('filtroMateria').val();
-        self.filtroMateria(materia);
-    };
-    
     self.mesas = self.mesas.sort(function(left, right) {
         return left.fecha() > right.fecha() ? 1 : -1;
     });
@@ -126,6 +134,7 @@ function ViewModel(data, options) {
 
 $(document).ready(function () {
     iniMaterialThings();
+    
     var settings = {
         url: "/rest",
         dataType: "json",
@@ -135,6 +144,7 @@ $(document).ready(function () {
         success: function(data, status, jqXHR) {
             viewModel = new ViewModel(data, mapping);
             ko.applyBindings(viewModel);
+            iniMarkThings();
         },
         error: function(jqXHR, status, error) {
             alert("Ocurrio un error al obtener los datos" + error.toString());

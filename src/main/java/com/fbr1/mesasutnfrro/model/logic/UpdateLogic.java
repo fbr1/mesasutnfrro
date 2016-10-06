@@ -19,6 +19,7 @@ import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.text.ParseException;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -39,7 +40,7 @@ public class UpdateLogic {
      * extracts the Llamado from the raw PDFs in the URLs and saves it.
      *
      */
-    public void checkUpdates() throws IOException{
+    public void checkUpdates() throws IOException, ParseException{
         if(isContentNew()){
 
             updateLlamadosFromURLs(this.urls);
@@ -50,7 +51,12 @@ public class UpdateLogic {
         }
     }
 
-    public void updateLlamadosFromURLs(Set<String> urls) throws IOException{
+    /**
+     * Downloads PDFs from the urls, extracts mesa, builds a Llamado and add it to permanent storage
+     *
+     * @param urls - Iterable of urls in Strings
+     */
+    public void updateLlamadosFromURLs(Iterable<String> urls) throws IOException,ParseException {
         List<Mesa> mesas = new ArrayList<>();
         MesasExtractor mesasExtractor = new MesasExtractor();
 

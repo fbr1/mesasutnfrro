@@ -30,7 +30,7 @@ public class ParseHelperLogic {
      * @param date - Mesa's date in string format (dd-MM-yy)
      * @return      List of Examenes
      */
-    public ArrayList<Examen> getExamenes(ParseHelper helper, String date){
+    public ArrayList<Examen> getExamenes(ParseHelper helper, String date) throws ParseException{
 
         helper = processData(helper);
 
@@ -113,36 +113,38 @@ public class ParseHelperLogic {
      * @param dateStr - Mesa's date in string format (yyyy-MM-dd)
      * @return      Examen Object
      */
-    private Examen buildExamen(String especialidad, String aula, String examenStr, String dateStr){
+    private Examen buildExamen(String especialidad, String aula, String examenStr, String dateStr) throws ParseException{
 
         // Extract hour
         Pattern hoursPattern = Pattern.compile("(\\d{1,2}.\\d{2}.\\d{2})");
         Matcher m = hoursPattern.matcher(examenStr);
-        String hourStr = null;
+        String hourStr;
         if(m.find()){
             hourStr = m.group(1);
-            // Especial Case for using . instead of :
-            hourStr = hourStr.replace(".",":");
+        }else{
+            throw new ParseException("Hour not found in Examen", 0);
         }
 
         // Extract materia
         String materiaName = examenStr.replace(" " + hourStr, "");
         Materia materia = new Materia(materiaName, especialidad);
 
+        // Correct Edge Case when '.' is used instead of ':'
+        hourStr = hourStr.replace(".",":");
+
         // Transform hourStr from String to Date
         DateFormat examenDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         examenDateFormat.setTimeZone(TimeZone.getTimeZone("America/Argentina/Buenos_Aires"));
 
+        // Add a 0 to the left if there is one missing.
+        // Example: 5:00:00 -> 05:00:00
         if(hourStr.length() < HOUR_STR_LENGHT ){
             hourStr = HOUR_STR_FILLER + hourStr;
         }
+
         hourStr = dateStr + " " + hourStr;
-        Date fecha = new Date();
-        try {
-            fecha = examenDateFormat.parse(hourStr);
-        } catch (ParseException e) {
-            logger.error(e.getMessage(), e);
-        }
+
+        Date fecha = examenDateFormat.parse(hourStr);
 
         return new Examen(fecha, aula, materia);
     }

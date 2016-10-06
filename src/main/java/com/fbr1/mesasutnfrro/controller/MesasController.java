@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.stereotype.Controller;
 
 import java.io.IOException;
+import java.text.ParseException;
 
 @Controller
 @SuppressWarnings("serial")
@@ -17,7 +18,7 @@ public class MesasController {
     final Logger logger = LoggerFactory.getLogger(com.fbr1.mesasutnfrro.controller.MesasController.class);
 
     @RequestMapping(value = "/updatemesas")
-    public String updatemesas(Model model) throws IOException{
+    public String updatemesas(Model model) throws IOException, ParseException{
         String statusText = "no update";
         if(updateLogic.isTimeForUpdate()){
             updateLogic.checkUpdates();

@@ -57,19 +57,28 @@ public class ParseHelperLogic {
      * @param helper - first ParseHelper object
      * @return      ParseHelper Object filled with data from the first helper
      */
-    private ParseHelper processData(ParseHelper helper){
+    private ParseHelper processData(ParseHelper helper) throws ParseException{
         ArrayList<ParseHelper> helpers = new ArrayList<>();
+        List<String> splittedList= new ArrayList<>();
 
         String[] splitted = helper.getText().split(helper.getSplitPattern());
         Pattern tempReGex = Pattern.compile(helper.getMatchPattern());
         Matcher matcher = tempReGex.matcher(helper.getText());
-        List<String> splittedList= new ArrayList<>();
+
+        int lineCount = 0;
+
         for(String line : splitted){
             if(!line.isEmpty()){
+                lineCount++;
                 if(matcher.find()){
                     splittedList.add(matcher.group(1) + line);
                 }
             }
+        }
+
+        // Handles edge case when an Especialidad is missing.
+        if(lineCount != splittedList.size()){
+            throw new ParseException("The match pattern doesn't correspond with the split pattern",0);
         }
 
         String[] lines;

@@ -170,25 +170,37 @@ function formatearHora(milisegundos) {
 
 $(document).ready(function () {
     iniMaterialThings();
+
+    // First Load
+    // Take inline data
+
+    $("#loader").show();
+    var data = JSON.parse(document.getElementById('data').innerHTML);
+    viewModel = new ViewModel(data, mapping);
+    ko.applyBindings(viewModel);
+    iniMarkThings();
+    $("#loader").hide();
+
+    // Old ajax request
     
-    var settings = {
-        url: "/rest",
-        dataType: "json",
-        beforeSend: function(jqXHR, settings) {
-            $("#loader").show();
-        },
-        success: function(data, status, jqXHR) {
-            viewModel = new ViewModel(data, mapping);
-            ko.applyBindings(viewModel);
-            iniMarkThings();
-        },
-        error: function(jqXHR, status, error) {
-            alert("Ocurrio un error al obtener los datos" + error.toString());
-        },
-        complete: function(jqXHR, status) {
-            $("#loader").hide();
-        }
-    }; 
-    $.ajax(settings);
+//    var settings = {
+//        url: "/rest",
+//        dataType: "json",
+//        beforeSend: function(jqXHR, settings) {
+//            $("#loader").show();
+//        },
+//        success: function(data, status, jqXHR) {
+//            viewModel = new ViewModel(data, mapping);
+//            ko.applyBindings(viewModel);
+//            iniMarkThings();
+//        },
+//        error: function(jqXHR, status, error) {
+//            alert("Ocurrio un error al obtener los datos" + error.toString());
+//        },
+//        complete: function(jqXHR, status) {
+//            $("#loader").hide();
+//        }
+//    };
+//    $.ajax(settings);
     
 });

@@ -1,5 +1,9 @@
 package com.fbr1.mesasutnfrro.controller;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fbr1.mesasutnfrro.model.entity.Llamado;
+import com.fbr1.mesasutnfrro.model.logic.LlamadosLogic;
 import com.fbr1.mesasutnfrro.model.logic.UpdateLogic;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,9 +33,19 @@ public class MesasController {
     }
 
     @RequestMapping(value = "/")
-    public String home(){
+    public String home(Model model) throws JsonProcessingException {
+        Llamado llamado = llamadosLogic.getlastLlamado();
+
+        // Convert to JSON
+        ObjectMapper mapper = new ObjectMapper();
+        String jsonData = mapper.writeValueAsString(llamado);
+
+        model.addAttribute("data",jsonData);
         return "index";
     }
+
+    @Autowired
+    private LlamadosLogic llamadosLogic;
 
     @Autowired
     private  UpdateLogic updateLogic;

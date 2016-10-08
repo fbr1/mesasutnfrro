@@ -28,6 +28,11 @@ public class MesasController {
         return "updatemesas";
     }
 
+    @RequestMapping(value = "/")
+    public String home(){
+        return "index";
+    }
+
     @Autowired
     private  UpdateLogic updateLogic;
 

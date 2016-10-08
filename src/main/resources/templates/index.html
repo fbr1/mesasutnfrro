@@ -1,10 +1,15 @@
-<!DOCTYPE html>
-<html>
+<!DOCTYPE HTML>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
     <head>
-        <meta charset="UTF-8">
-        <link href="http://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
-        <link type="text/css" rel="stylesheet" href="css/materialize.css"  media="screen,projection"/>
-        <link type="text/css" rel="stylesheet" href="css/mesasutnfrro.css"  media="screen,projection"/>
+        <title>Mesas UTN FRRO</title>
+        <meta charset="UTF-8"/>
+        <link type="text/css" href="http://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet"/>
+        <link type="text/css" rel="stylesheet" media="screen"
+              href="../static/css/materialize.css"
+              th:href="@{css/materialize.css}" />
+        <link type="text/css" rel="stylesheet" media="screen"
+              href="../static/css/mesasutnfrro.css"
+              th:href="@{css/mesasutnfrro.css}" />
 
         <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     </head>
@@ -43,7 +48,7 @@
                                             optionsText:  function(item) {return item.especialidad;},
                                             value: filtroEspecialidad,
                                             event: {change: setCookieEspecialidad}">
-                                    <option value="" selected>Todas</option>
+                                    <option value="" selected="selected">Todas</option>
                                     <option value="ISI">Ingeniería en sistemas</option>
                                     <option value="IQ">Ingeniería química</option>
                                     <option value="IM">Ingeniería mecánica</option>
@@ -53,7 +58,7 @@
                                 <label>Especialidad</label>
                             </div>
                             <div class="input-field col s12 m3">
-                                <input placeholder="Comience a escribir..." id="filtroMateria" type="text" class="validate" data-bind="textInput: $root.filtroMateria">
+                                <input name="Busqueda" placeholder="Comience a escribir..." id="filtroMateria" type="text" class="validate" data-bind="textInput: $root.filtroMateria" />
                                 <label for="filtroMateria">Materia</label>
                             </div>
                         </div>
@@ -105,12 +110,12 @@
             </section>
         </div>
 
-        <script type="text/javascript" src="js/jquery-2.2.3.min.js"></script>
-        <script type="text/javascript" src="js/materialize.js"></script>
-        <script type="text/javascript" src="js/ko.js"></script>
-        <script type="text/javascript" src="js/knockout.mapping-latest.debug.js"></script>
-        <script type="text/javascript" src="js/jquery.mark.min.js"></script>
-        <script type="text/javascript" src="js/jquery.cookie.js"></script>
-        <script type="text/javascript" src="js/mesasutnfrro.js"></script>
+        <script type="text/javascript" src="../static/js/jquery-2.2.3.min.js" th:src="@{js/jquery-2.2.3.min.js}"></script>
+        <script type="text/javascript" src="../static/js/materialize.js" th:src="@{js/materialize.js}"></script>
+        <script type="text/javascript" src="../static/js/ko.js" th:src="@{js/ko.js}"></script>
+        <script type="text/javascript" src="../static/js/knockout.mapping-latest.debug.js" th:src="@{js/knockout.mapping-latest.debug.js}"></script>
+        <script type="text/javascript" src="../static/js/jquery.mark.min.js" th:src="@{js/jquery.mark.min.js}"></script>
+        <script type="text/javascript" src="../static/js/jquery.cookie.js" th:src="@{js/jquery.cookie.js}"></script>
+        <script type="text/javascript" src="../static/js/mesasutnfrro.js" th:src="@{js/mesasutnfrro.js}"></script>
     </body>
 </html>

@@ -21,6 +21,7 @@ public class MesasExtractor {
 
     private int nroLlamado = 0;
     private int añoLlamado = 0;
+    private String mesaDay = null;
     private String mesaDate = null;
 
     private static final Map<String, String> monthsMap = new HashMap<>();
@@ -92,13 +93,15 @@ public class MesasExtractor {
             // Extract Año de llamado and Mesa Date
             if(añoLlamado == 0){
 
-                // Regex for a string with a number of 1 or 2 digits and a year in the range 2000-2099
-                Matcher matcher = Pattern.compile("\\d{1,2} .*(\\d{4})").matcher(line);
+                // Regex matching "<DAY> <DAYNUMBER> DE <MONTH> DE <YEAR>"
+                Matcher matcher = Pattern.compile("(?<day>[a-zA-Z]+) (?<daynumber>\\d{1,2}) DE (?<month>[a-zA-Z]+) DE (?<year>\\d{4})").matcher(line);
 
                 if(matcher.find()){
-                    this.mesaDate = this.parseDate(line);
+                    mesaDate = parseDate(matcher.group("daynumber"), matcher.group("month"), matcher.group("year"));
 
-                    añoLlamado = Integer.valueOf(matcher.group(1));
+                    mesaDay = matcher.group("day");
+
+                    añoLlamado = Integer.valueOf(matcher.group("year"));
                     remove = true;
                 }
             }
@@ -124,31 +127,16 @@ public class MesasExtractor {
     /**
      * Parse date from the Mesas' PDF date line
      *
-     * @param line - line containing a date
      * @return      String with the Mesa's date in (yyyy-MM-dd) format
      */
-    public String parseDate(String line) throws ParseException{
+    public String parseDate(String dayNumber, String month, String year) throws ParseException{
 
-        // Regex matching "<DAYNUMBER> DE <MONTH> DE <YEAR>"
-        Matcher matcher = Pattern.compile("(?<day>\\d{1,2}) DE (?<month>.*) DE (?<year>\\d{4})").matcher(line);
-
-        if(matcher.find()){
-
-            String year = matcher.group("year");
-
-            String month = MesasExtractor.monthsMap.get(matcher.group("month").toUpperCase());
-            if (month == null){
-                throw new ParseException("The month parsed doesn't correspond with a real month in spanish",
-                        line.indexOf(matcher.group("month")));
-            }
-
-            String day = matcher.group("day");
-
-            return year + "-" + month + "-" + day;
-
-        }else {
-            throw new ParseException("No date was found in the given String", 0);
+        month = MesasExtractor.monthsMap.get(month.toUpperCase());
+        if (month == null){
+            throw new ParseException("The month parsed doesn't correspond with a real month in spanish", 0);
         }
+
+        return year + "-" + month + "-" + dayNumber;
     }
 
     /**
@@ -304,6 +292,15 @@ public class MesasExtractor {
         helper.setText(text);
 
         Mesa mesa = new Mesa();
+
+        // Set WeekDay
+        for(Mesa.WeekDay weekDay : Mesa.WeekDay.values()){
+            if (weekDay.name().equals(mesaDay)){
+                mesa.setWeekDay(weekDay);
+                break;
+            }
+        }
+
         mesa.setFecha(mesaDate);
         ArrayList<Examen> examenes = new ParseHelperLogic().getExamenes(helper, dateStr);
         for(Examen examen : examenes){

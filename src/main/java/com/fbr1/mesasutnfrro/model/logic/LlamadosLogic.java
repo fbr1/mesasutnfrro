@@ -88,10 +88,14 @@ public class LlamadosLogic {
 
         Llamado llamado = new Llamado(añoLlamado, numeroLlamado, mesas.get(0).getFecha());
 
+        int weekType = 0;
+
         for(Mesa mesa : mesas){
+            weekType += mesa.getWeekDay().getWeekDayValue();
             mesa.setLlamado(llamado);
         }
 
+        llamado.setWeekType(weekType);
         llamado.setMesas(mesas);
 
         this.add(llamado);

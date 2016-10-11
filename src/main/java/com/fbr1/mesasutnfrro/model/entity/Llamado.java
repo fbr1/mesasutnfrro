@@ -24,6 +24,11 @@ public class Llamado{
     @Column(name="date")
     private Date date;
 
+    // This variable is the result of adding the values of the Llamado's Mesas' WeekDay
+    // The goal of this is to be able to unequivocally determine the combination of days that forms the Llamado
+    @Column(name="week_type")
+    private int weekType;
+
     @OneToMany(mappedBy="llamado", fetch = FetchType.EAGER, cascade={CascadeType.ALL})
     @JsonManagedReference
     private List<Mesa> mesas;
@@ -42,6 +47,14 @@ public class Llamado{
     }
 
     public Llamado () {} // Required for json parser
+
+    public int getWeekType() {
+        return weekType;
+    }
+
+    public void setWeekType(int weekType) {
+        this.weekType = weekType;
+    }
 
     public Date getDate() {
         return date;

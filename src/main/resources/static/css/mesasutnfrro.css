@@ -110,3 +110,7 @@ mark{
     margin-bottom: 1.5rem;
 }
 /* FIN especificos */
+
+nav form{
+    padding: 0 15px;
+}

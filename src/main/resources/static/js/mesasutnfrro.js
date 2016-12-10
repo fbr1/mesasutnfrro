@@ -120,6 +120,7 @@ function ViewModel(data, options) {
 function iniMaterialThings() {
     $(".button-collapse").sideNav();
 	$('select').material_select();
+    $('.modal').modal();
 }
 
 function  iniMarkThings() {
@@ -202,5 +203,4 @@ $(document).ready(function () {
 //        }
 //    };
 //    $.ajax(settings);
-    
 });

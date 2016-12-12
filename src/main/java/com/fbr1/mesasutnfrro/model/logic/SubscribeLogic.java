@@ -15,13 +15,13 @@ import java.io.IOException;
 @Service
 public class SubscribeLogic {
 
-    @Value("${API_KEY}")
+    @Value("${MAILCHIMP_API_KEY}")
     private String API_KEY;
 
-    @Value("${LIST_ID}")
+    @Value("${MAILCHIMP_LIST_ID}")
     private String LIST_ID;
 
-    @Value("${CAMPAIGN_ID}")
+    @Value("${MAILCHIMP_CAMPAIGN_ID}")
     private String CAMPAIGN_ID;
 
     private final static Logger logger = LoggerFactory.getLogger(SubscribeLogic.class);

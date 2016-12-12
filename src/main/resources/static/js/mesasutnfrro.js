@@ -112,6 +112,31 @@ function ViewModel(data, options) {
     self.mesas = self.mesas.sort(function(left, right) {
         return left.fecha() > right.fecha() ? 1 : -1;
     });
+
+
+
+    self.subscribe = function(formElement) {
+        var token = $("meta[name='_csrf']").attr("content");
+        var header = $("meta[name='_csrf_header']").attr("content");
+        $.ajax({
+            url: "/subscribe",
+            type: 'POST',
+            data: $(formElement).serialize(),
+            beforeSend: function(jqXHR) {
+                $("#loader_subscripcion").css('visibility', 'visible');
+                jqXHR.setRequestHeader(header, token);
+            },
+            success: function(data, status, jqXHR) {
+                $('#modalSubscribe').modal('close');
+            },
+            error: function(jqXHR, status, error) {
+                Materialize.toast('Ocurrio un error al procesar el email', 4000)
+            },
+            complete: function(jqXHR, status) {
+                $("#loader_subscripcion").css('visibility', 'hidden');
+            }
+        });
+    }
     
 }
 
@@ -120,7 +145,11 @@ function ViewModel(data, options) {
 function iniMaterialThings() {
     $(".button-collapse").sideNav();
 	$('select').material_select();
-    $('.modal').modal();
+    $('.modal').modal({
+        ready: function(modal, trigger) {
+            $(modal).find('.focus').focus();
+        }
+    });
 }
 
 function  iniMarkThings() {

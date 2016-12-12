@@ -114,3 +114,39 @@ mark{
 nav form{
     padding: 0 15px;
 }
+
+.modal-footer .btn{
+    float:none !important;
+}
+
+/* Toast at the bottom */
+
+@media only screen and (min-width : 601px) and (max-width : 1260px) {
+.toast {
+width: 100%;
+border-radius: 0;
+} }
+
+@media only screen and (min-width : 1261px) {
+.toast {
+width: 100%;
+border-radius: 0;
+} }
+
+@media only screen and (min-width : 601px) and (max-width : 1260px) {
+#toast-container {
+min-width: 70%;
+bottom: 0%;
+top: 90%;
+right: 0%;
+left: 0%;
+margin: 0 auto;} }
+
+@media only screen and (min-width : 1261px) {
+#toast-container {
+min-width: 90%;
+bottom: 0%;
+top: 90%;
+right: 0%;
+left: 0%;
+margin: 0 auto;} }

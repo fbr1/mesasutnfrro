@@ -66,7 +66,8 @@ public class MesasExtractor {
     public String cleanText(String oriText) throws ParseException{
 
         // Remove text containing 1-Mañana, 2-Tarde y 3-Noche
-        oriText = oriText.replaceAll("\\d-\\w\\p{L}+ ", "");
+        oriText = Pattern.compile(".*(?:Ma\\p{L}ana*|Tarde\\p{L}*|Noche\\p{L}*)",
+                Pattern.CASE_INSENSITIVE).matcher(oriText).replaceAll("");
 
         List<String> lines = Arrays.asList(oriText.split(System.getProperty("line.separator")));
         List<String> cleanedLines = new ArrayList<>();
@@ -76,34 +77,31 @@ public class MesasExtractor {
             boolean remove = false;
 
             // Extract Numero de llamado
-            if(nroLlamado == 0 ) {
-                if (line.toLowerCase().contains("LLAMADO".toLowerCase())) {
 
-                    // Regex for a number of 1 or 2 digits
-                    Matcher matcher = Pattern.compile("\\d{1,2}").matcher(line);
+            if (line.toLowerCase().contains("LLAMADO".toLowerCase())) {
 
-                    if (matcher.find()) {
-                        nroLlamado = Integer.valueOf(matcher.group(0));
-                    }
+                // Regex for a number of 1 or 2 digits
+                Matcher matcher = Pattern.compile("\\d{1,2}").matcher(line);
 
-                    remove = true;
+                if (matcher.find()) {
+                    nroLlamado = Integer.valueOf(matcher.group(0));
                 }
+
+                remove = true;
             }
 
             // Extract Año de llamado and Mesa Date
-            if(añoLlamado == 0){
 
-                // Regex matching "<DAY> <DAYNUMBER> DE <MONTH> DE <YEAR>"
-                Matcher matcher = Pattern.compile("(?<day>[a-zA-Z]+) (?<daynumber>\\d{1,2}) DE (?<month>[a-zA-Z]+) DE (?<year>\\d{4})").matcher(line);
+            // Regex matching "<DAY> <DAYNUMBER> DE <MONTH> DE <YEAR>"
+            Matcher matcher = Pattern.compile("(?<day>[a-zA-Z]+) (?<daynumber>\\d{1,2}) DE (?<month>[a-zA-Z]+) DE (?<year>\\d{4})").matcher(line);
 
-                if(matcher.find()){
-                    mesaDate = parseDate(matcher.group("daynumber"), matcher.group("month"), matcher.group("year"));
+            if(matcher.find()){
+                mesaDate = parseDate(matcher.group("daynumber"), matcher.group("month"), matcher.group("year"));
 
-                    mesaDay = matcher.group("day");
+                mesaDay = matcher.group("day");
 
-                    añoLlamado = Integer.valueOf(matcher.group("year"));
-                    remove = true;
-                }
+                añoLlamado = Integer.valueOf(matcher.group("year"));
+                remove = true;
             }
 
             // Remove Title of the document and Table header

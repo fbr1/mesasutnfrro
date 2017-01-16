@@ -44,3 +44,4 @@ log/
 target/
 
 # Custom
+/src/main/resources/mesasutnfrro/node_modules/

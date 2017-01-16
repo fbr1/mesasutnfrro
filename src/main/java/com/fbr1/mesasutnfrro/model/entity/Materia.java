@@ -1,15 +1,19 @@
 package com.fbr1.mesasutnfrro.model.entity;
 
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
+
 import javax.persistence.*;
 
 @Entity
 @Table(name="materias")
+@JsonIdentityInfo(generator=ObjectIdGenerators.PropertyGenerator.class, property="id")
 public class Materia {
 
     @Id
     @GeneratedValue(strategy= GenerationType.IDENTITY)
     @Column(name="id_materia")
-    private int ID;
+    private long Id;
 
     @Column(name="nombre")
     private String nombre;
@@ -43,12 +47,12 @@ public class Materia {
 
     }
 
-    public int getID() {
-        return ID;
+    public long getId() {
+        return Id;
     }
 
-    public void setID(int ID) {
-        this.ID = ID;
+    public void setID(long ID) {
+        this.Id = Id;
     }
 
     public String getNombre() {

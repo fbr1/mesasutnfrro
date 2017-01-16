@@ -48,7 +48,7 @@ public class MesasRESTService {
     }
 
     @RequestMapping(value= "/examen/{id}", method = RequestMethod.PUT)
-    public Llamado updateExamen(@PathVariable int id, @RequestBody Examen examen) {
+    public Llamado updateExamen(@PathVariable long id, @RequestBody Examen examen) {
         Examen oldExamen = examenRepository.findOne(id);
         if (oldExamen == null) { throw new ObjetoNotFoundException("No se ha podido actualizar el examen.");}
         oldExamen.setAula(examen.getAula());

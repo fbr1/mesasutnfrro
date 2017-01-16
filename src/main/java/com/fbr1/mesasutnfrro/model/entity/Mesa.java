@@ -1,7 +1,9 @@
 package com.fbr1.mesasutnfrro.model.entity;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import com.fbr1.mesasutnfrro.util.WeekDayConverter;
 
 import javax.persistence.*;
@@ -11,6 +13,7 @@ import java.util.List;
 
 @Entity
 @Table(name="mesas")
+@JsonIdentityInfo(generator=ObjectIdGenerators.PropertyGenerator.class, property="id")
 public class Mesa {
 
     public enum WeekDay {
@@ -38,7 +41,7 @@ public class Mesa {
     @Id
     @GeneratedValue(strategy= GenerationType.IDENTITY)
     @Column(name="id_mesa")
-    private int ID;
+    private long Id;
 
     @Column(name="fecha")
     private Date fecha;
@@ -48,12 +51,10 @@ public class Mesa {
     private WeekDay weekDay;
 
     @OneToMany(mappedBy = "mesa", fetch = FetchType.EAGER, cascade={CascadeType.ALL})
-    @JsonManagedReference
     private List<Examen> examenes;
 
     @ManyToOne
     @JoinColumn(name = "id_llamado")
-    @JsonBackReference
     private Llamado llamado;
 
     public Mesa(Date fecha, List<Examen> examenes) {
@@ -63,12 +64,12 @@ public class Mesa {
 
     public Mesa () {} // Required for json parser
 
-    public int getID() {
-        return ID;
+    public long getID() {
+        return Id;
     }
 
-    public void setID(int ID) {
-        this.ID = ID;
+    public void setID(long Id) {
+        this.Id = Id;
     }
 
     public WeekDay getWeekDay() {

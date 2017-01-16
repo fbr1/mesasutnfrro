@@ -1,6 +1,8 @@
 package com.fbr1.mesasutnfrro.model.entity;
 
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 
 import javax.persistence.*;
 import java.util.Date;
@@ -8,12 +10,13 @@ import java.util.List;
 
 @Entity
 @Table(name="llamados")
+@JsonIdentityInfo(generator=ObjectIdGenerators.PropertyGenerator.class, property="id")
 public class Llamado{
 
     @Id
     @GeneratedValue(strategy= GenerationType.IDENTITY)
     @Column(name="id_llamado")
-    private int ID;
+    private long Id;
 
     @Column(name="año")
     private int año;
@@ -30,7 +33,6 @@ public class Llamado{
     private int weekType;
 
     @OneToMany(mappedBy="llamado", fetch = FetchType.EAGER, cascade={CascadeType.ALL})
-    @JsonManagedReference
     private List<Mesa> mesas;
 
     public Llamado(int año, int numero, Date date, List<Mesa> mesas) {
@@ -64,12 +66,12 @@ public class Llamado{
         this.date = date;
     }
 
-    public int getID() {
-        return ID;
+    public long getId() {
+        return Id;
     }
 
-    public void setID(int ID) {
-        this.ID = ID;
+    public void setId(long ID) {
+        this.Id = ID;
     }
 
     public int getAño() {

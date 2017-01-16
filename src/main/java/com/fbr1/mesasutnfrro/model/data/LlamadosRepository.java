@@ -7,7 +7,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 
 @Transactional
-public interface LlamadosRepository extends CrudRepository<Llamado, Integer> {
+public interface LlamadosRepository extends CrudRepository<Llamado, Long> {
 
     Llamado findByAñoAndNumero(int año, int numero);
 

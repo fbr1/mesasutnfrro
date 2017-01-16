@@ -5,5 +5,5 @@ import org.springframework.data.repository.CrudRepository;
 import org.springframework.transaction.annotation.Transactional;
 
 @Transactional
-public interface MesaRepository extends CrudRepository<Mesa, Integer> {
+public interface MesaRepository extends CrudRepository<Mesa, Long> {
 }

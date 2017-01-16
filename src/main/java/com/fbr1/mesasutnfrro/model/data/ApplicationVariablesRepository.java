@@ -6,7 +6,7 @@ import org.springframework.data.repository.CrudRepository;
 import org.springframework.transaction.annotation.Transactional;
 
 @Transactional
-public interface ApplicationVariablesRepository extends CrudRepository<ApplicationVariables, Integer> {
+public interface ApplicationVariablesRepository extends CrudRepository<ApplicationVariables, Long> {
 
     @Query("from ApplicationVariables av where av.id = (select max(avv.id) from ApplicationVariables avv)")
     ApplicationVariables findTop();

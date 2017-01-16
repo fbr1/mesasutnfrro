@@ -1,18 +1,21 @@
 package com.fbr1.mesasutnfrro.model.entity;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 
 import javax.persistence.*;
 import java.util.Date;
 
 @Entity
 @Table(name="examenes")
+@JsonIdentityInfo(generator=ObjectIdGenerators.PropertyGenerator.class, property="id")
 public class Examen {
 
     @Id
     @GeneratedValue(strategy= GenerationType.IDENTITY)
     @Column(name="id_examen")
-    private int ID;
+    private long Id;
 
     @Column(name="hora")
     private Date fecha;
@@ -26,7 +29,6 @@ public class Examen {
 
     @ManyToOne
     @JoinColumn(name = "id_mesa")
-    @JsonBackReference
     private Mesa mesa;
 
     public Examen(Date fecha, String aula, Materia materia) {
@@ -37,12 +39,12 @@ public class Examen {
 
     public Examen() {} // Required for json parser
 
-    public int getID() {
-        return ID;
+    public long getID() {
+        return Id;
     }
 
-    public void setID(int ID) {
-        this.ID = ID;
+    public void setID(long Id) {
+        this.Id = Id;
     }
 
     public Date getFecha() {

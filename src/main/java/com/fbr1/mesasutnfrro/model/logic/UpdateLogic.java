@@ -1,5 +1,6 @@
 package com.fbr1.mesasutnfrro.model.logic;
 
+import com.ecwid.maleorang.MailchimpException;
 import com.fbr1.mesasutnfrro.model.entity.ApplicationVariables;
 import com.fbr1.mesasutnfrro.model.entity.Llamado;
 import com.fbr1.mesasutnfrro.model.entity.Mesa;
@@ -40,13 +41,18 @@ public class UpdateLogic {
      * extracts the Llamado from the raw PDFs in the URLs and saves it.
      *
      */
-    public void checkUpdates() throws IOException, ParseException{
+    public void checkUpdates() throws IOException, ParseException, MailchimpException {
         if(isContentNew()){
 
             updateLlamadosFromURLs(this.urls);
 
             // If all went well, store used URLs
             visitedURLsLogic.addAll(this.urls);
+
+            // Notify subscription users of new content
+
+            subscribeLogic.sendCampaign();
+
             logger.info("Add URLs: ", this.urls);
         }
     }
@@ -188,4 +194,7 @@ public class UpdateLogic {
 
     @Autowired
     private VisitedURLsLogic visitedURLsLogic;
+
+    @Autowired
+    private SubscribeLogic subscribeLogic;
 }

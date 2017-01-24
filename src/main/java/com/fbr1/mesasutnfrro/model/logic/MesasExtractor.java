@@ -66,7 +66,7 @@ public class MesasExtractor {
     public String cleanText(String oriText) throws ParseException{
 
         // Remove text containing 1-Mañana, 2-Tarde y 3-Noche
-        oriText = Pattern.compile(".*(?:Ma\\p{L}ana*|Tarde\\p{L}*|Noche\\p{L}*)",
+        oriText = Pattern.compile("(?:\\d-)?(?:Ma\\p{L}ana*|Tarde\\p{L}*|Noche\\p{L}*)",
                 Pattern.CASE_INSENSITIVE).matcher(oriText).replaceAll("");
 
         List<String> lines = Arrays.asList(oriText.split(System.getProperty("line.separator")));
@@ -113,7 +113,7 @@ public class MesasExtractor {
 
             line = removeExtraSpaces(line).trim();
 
-            // If it's not a blank line and we don't have to skip the line
+            // If the line isn't blank and we don't want to skip the line
             if(line.length() > 1 && !remove){
                 cleanedLines.add(line);
             }
@@ -148,12 +148,13 @@ public class MesasExtractor {
         StringBuilder stringBuilder = new StringBuilder();
 
         // Regex for especialidades
-        Pattern especialidadRegex = Pattern.compile("(ISI ?|IE ?|IQ ?|IC ?|IM ?)");
+        Pattern especialidadRegex = Pattern.compile("( ?(?:ISI|IE|IQ|IC|IM) ?)");
 
         // Regex matching one or more aulas
-        Pattern aulaRegex = Pattern.compile("([\\d{1,3}/]+\\d{1,3} ?|\\d{1,3} ?|SUM)");
+        Pattern aulaRegex = Pattern.compile("([\\d{1,3}/]+\\d{1,3} ?|\\d{1,3} ?|SUM )");
 
-        // Regex matching aula in line
+        // Regex matching aula in line.
+        // i.e: "308"
         Pattern aulaLineRegex = Pattern.compile("(^\\d{2,3}|SUM)$");
 
         // Regex matching a line with only the time
@@ -169,10 +170,19 @@ public class MesasExtractor {
             Matcher matcher = especialidadRegex.matcher(line);
             boolean esEspecialidad = matcher.find();
             if(esEspecialidad){
-                // If there is text after the especialidad, add a newline
-                if(matcher.group(1).contains(" ")){
-                    line = line.replace(matcher.group(1),
-                            matcher.group(1).substring(0, matcher.group(1).length()-1)+System.getProperty("line.separator"));
+
+                /* If there is text before or after the especialidad, add a newline
+                 * Example:
+                 *      "210 REDES 8:00:001-Mañana ISI" > "210 REDES 8:00:001-Mañana\nISI"
+                 *      "ISI 308 Matemática Discreta 8:00:00" > "ISI\n308 Matemática Discreta 8:00:00"
+                 */
+
+                String match = matcher.group(1);
+
+                if(match.charAt(match.length()-1)==' '){
+                    line = line.replace(match, match.substring(0, match.length()-1) + System.getProperty("line.separator"));
+                }else if(match.charAt(0)==' '){
+                    line = line.replace(match, System.getProperty("line.separator") + match.substring(1, match.length()));
                 }
             }
 
@@ -180,12 +190,17 @@ public class MesasExtractor {
             boolean esAula = matcher.find();
             if(esAula) {
                 // If there is text after the aula, add a newline
+                // Example: "309 Analisis Matematico II" > "309\nAnalisis Matematico II"
                 if (matcher.group(1).contains(" ")) {
                     line = line.replace(matcher.group(1),
                             matcher.group(1).substring(0, matcher.group(1).length() - 1) + System.getProperty("line.separator"));
                 } else {
-                    // Edge case for an Aula split in two lines
-                    // Example: Mesa of 12/02/2016
+
+                    /* Edge case for an Aula split in two lines
+                     * Example(Mesa of 12/02/2016) :
+                     *      308
+                     *      309 Analisis Matematico II
+                     */
                     if(aulaLineRegex.matcher(line).find() && i-1 >=0 && i+1 < lines.size()){
 
                         // If the next line matches aulaLineRegex, the next iteration handles it

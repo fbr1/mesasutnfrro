@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
 
-public class ParseHelper {
+public class MesaParseHelper {
 
     private static final int ESPECIALIDAD = 0;
     private static final int AULA = 1;
@@ -28,33 +28,37 @@ public class ParseHelper {
     public static final Pattern DATE_REGEX =
             Pattern.compile("(?<day>[a-zA-Z]+) (?<daynumber>\\d{1,2}) DE (?<month>[a-zA-Z]+) DE (?<year>\\d{4})");
 
+    // Regex matching  1-Mañana, 2-Tarde y 3-Noche
+    public static final Pattern TURNO_REGEX =
+            Pattern.compile("(?:\\d-)?(?:Ma\\p{L}ana*|Tarde\\p{L}*|Noche\\p{L}*)",Pattern.CASE_INSENSITIVE);
+
     public static final Pattern HOURS_REGEX = Pattern.compile("(\\d{1,2}.\\d{2}.\\d{2})");
 
 
     private int depth;
     private String name;
     private List<String> lines;
-    private List<ParseHelper> childs;
+    private List<MesaParseHelper> childs;
 
     public Pattern getMatchPattern(){
         switch(this.depth){
-            case ParseHelper.ESPECIALIDAD:
+            case MesaParseHelper.ESPECIALIDAD:
                 return ESPECIALIDAD_REGEX;
-            case ParseHelper.AULA:
+            case MesaParseHelper.AULA:
                 return AULA_REGEX;
-            case ParseHelper.EXAMEN:
+            case MesaParseHelper.EXAMEN:
                 return Pattern.compile("(.+)");
             default:
                 return null;
         }
     }
 
-    public ParseHelper() {
+    public MesaParseHelper() {
         this.depth = 0;
         lines = new ArrayList<>();
     }
 
-    public ParseHelper(int depth) {
+    public MesaParseHelper(int depth) {
         this();
         this.depth = depth;
     }
@@ -75,11 +79,11 @@ public class ParseHelper {
         this.name = name;
     }
 
-    public List<ParseHelper> getChilds() {
+    public List<MesaParseHelper> getChilds() {
         return childs;
     }
 
-    public void setChilds(ArrayList<ParseHelper> childs) {
+    public void setChilds(ArrayList<MesaParseHelper> childs) {
         this.childs = childs;
     }
 

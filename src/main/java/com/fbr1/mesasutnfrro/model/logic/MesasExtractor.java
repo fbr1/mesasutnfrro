@@ -1,6 +1,7 @@
 package com.fbr1.mesasutnfrro.model.logic;
 
 import com.fbr1.mesasutnfrro.model.entity.*;
+import com.fbr1.mesasutnfrro.util.MesasUtil;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.text.PDFTextStripper;
 
@@ -18,6 +19,9 @@ import org.slf4j.LoggerFactory;
 public class MesasExtractor {
 
     private static final Logger logger = LoggerFactory.getLogger(MesasExtractor.class);
+    static private final String DATE_FORMAT = "yyyy-MM-dd";
+    static final String DATE_HOUR_FORMAT = "yyyy-MM-dd HH:mm:ss";
+    static final String TIMEZONE = "America/Argentina/Buenos_Aires";
 
     private int nroLlamado = 0;
     private int añoLlamado = 0;
@@ -50,7 +54,7 @@ public class MesasExtractor {
     public Mesa processPDF(PDDocument pdd) throws IOException, ParseException{
 
         PDFTextStripper stripper = new PDFTextStripper();
-        String text=cleanText(stripper.getText(pdd));
+        String text=normalizeText(cleanText(stripper.getText(pdd)));
         
         pdd.close();
 
@@ -61,13 +65,12 @@ public class MesasExtractor {
      * Extract relevant data of the Llamado and remove unnecessary lines
      *
      * @param oriText - Text stripped from the Mesa PDF
-     * @return      String containing an uniform format of Examanes
+     * @return      List<String>
      */
-    public String cleanText(String oriText) throws ParseException{
+    public List<String> cleanText(String oriText) throws ParseException{
 
         // Remove text containing 1-Mañana, 2-Tarde y 3-Noche
-        oriText = Pattern.compile("(?:\\d-)?(?:Ma\\p{L}ana*|Tarde\\p{L}*|Noche\\p{L}*)",
-                Pattern.CASE_INSENSITIVE).matcher(oriText).replaceAll("");
+        oriText = MesaParseHelper.TURNO_REGEX.matcher(oriText).replaceAll("");
 
         List<String> lines = Arrays.asList(oriText.split(System.getProperty("line.separator")));
         List<String> cleanedLines = new ArrayList<>();
@@ -80,7 +83,8 @@ public class MesasExtractor {
         for(String line : lines){
 
             // If the line is blank, skip it
-            line = removeExtraSpaces(line).trim();
+            line = MesasUtil.removeExtraSpaces(line).trim();
+
             if (line.length() <=1){
                 continue;
             }
@@ -110,7 +114,7 @@ public class MesasExtractor {
 
             // Extract Año de llamado and Mesa Date
             if (!dateFound){
-                Matcher matcher = ParseHelper.DATE_REGEX.matcher(line);
+                Matcher matcher = MesaParseHelper.DATE_REGEX.matcher(line);
 
                 if(matcher.find()){
                     mesaDate = parseDate(matcher.group("daynumber"), matcher.group("month"), matcher.group("year"));
@@ -134,7 +138,7 @@ public class MesasExtractor {
 
         }
 
-        return normalizeText(cleanedLines);
+        return cleanedLines;
     }
 
     /**
@@ -159,7 +163,7 @@ public class MesasExtractor {
      * @param lines - lines cleaned from the Mesa PDF
      * @return      String containing an normalized format of Examanes
      */
-    private String normalizeText(List<String> lines){
+    public String normalizeText(List<String> lines){
         StringBuilder stringBuilder = new StringBuilder();
 
         for(int i = 0; i< lines.size(); i++){
@@ -168,13 +172,13 @@ public class MesasExtractor {
 
             boolean skip = false;
 
-            Matcher matcher = ParseHelper.ESPECIALIDAD_REGEX.matcher(line);
+            Matcher matcher = MesaParseHelper.ESPECIALIDAD_REGEX.matcher(line);
             boolean esEspecialidad = matcher.find();
             if(esEspecialidad){
 
                 /* If there is text before or after the especialidad, add a newline
                  * Example:
-                 *      "210 REDES 8:00:001-Mañana ISI" > "210 REDES 8:00:001-Mañana\nISI"
+                 *      "210 REDES 8:00:00 ISI" > "210 REDES 8:00:00\nISI"
                  *      "ISI 308 Matemática Discreta 8:00:00" > "ISI\n308 Matemática Discreta 8:00:00"
                  */
 
@@ -187,7 +191,7 @@ public class MesasExtractor {
                 }
             }
 
-            matcher = ParseHelper.AULA_REGEX.matcher(line);
+            matcher = MesaParseHelper.AULA_REGEX.matcher(line);
             boolean esAula = matcher.find();
             if(esAula) {
 
@@ -203,15 +207,15 @@ public class MesasExtractor {
                      *      308
                      *      309 Analisis Matematico II
                      */
-                    if(ParseHelper.AULA_LINE_REGEX.matcher(line).find() && i-1 >=0 && i+1 < lines.size()){
+                    if(MesaParseHelper.AULA_LINE_REGEX.matcher(line).find() && i-1 >=0 && i+1 < lines.size()){
 
                         // If the next line matches aulaLineRegex, the next iteration handles it
-                        matcher = ParseHelper.AULA_LINE_REGEX.matcher(lines.get(i + 1));
+                        matcher = MesaParseHelper.AULA_LINE_REGEX.matcher(lines.get(i + 1));
                         if (matcher.find()) {
                             skip = true;
                         }else{
                             // If the previous line matches aulaLineRegex, append it at the beginning of the line
-                            matcher = ParseHelper.AULA_LINE_REGEX.matcher(lines.get(i - 1));
+                            matcher = MesaParseHelper.AULA_LINE_REGEX.matcher(lines.get(i - 1));
                             if (matcher.find()) {
                                 line = matcher.group(1) + "/" + line;
                             }
@@ -225,11 +229,11 @@ public class MesasExtractor {
              *  Edge case for hours using two rows
              *  Example taken from Mesa of 12/02/2016:
              *
-             *      IE
-             *      SUM
-             *      Análisis Matemático I
-             *      17:00:00
-             *      Análisis Matemático II
+             *      IE                                      IE
+             *      SUM                                     SUM
+             *      Análisis Matemático I               >   Análisis Matemático I 17:00:00
+             *      17:00:00                                Análisis Matemático II 17:00:00
+             *      Análisis Matemático II                  110/111 Química General 16:30:00
              *      110/111 Química General 16:30:00
              *
              */
@@ -237,12 +241,12 @@ public class MesasExtractor {
             if(!esEspecialidad && !esAula){
                 if(i-1>=0){
                     // Check if the previous line has an Horario, if so append it after the Materia
-                    matcher = ParseHelper.HOURS_LINE_REGEX.matcher(lines.get(i-1));
+                    matcher = MesaParseHelper.HOURS_LINE_REGEX.matcher(lines.get(i-1));
                     if(matcher.find()){
                         line += " " + matcher.group(1);
                     }else if(i+1<lines.size()){
                         // Check if the next line has an Horario, if so append it after the Materia
-                        matcher = ParseHelper.HOURS_LINE_REGEX.matcher(lines.get(i+1));
+                        matcher = MesaParseHelper.HOURS_LINE_REGEX.matcher(lines.get(i+1));
                         if(matcher.find()){
                             line += " " + matcher.group(1);
                             i++;
@@ -262,48 +266,22 @@ public class MesasExtractor {
     }
 
     /**
-     * Removes white spaces at the beginning and end of a String.
-     * Also removes double white spaces.
-     *
-     * @param str - String to remove extra white spaces
-     * @return      String with extra white spaces removed
-     */
-    private String removeExtraSpaces(String str){
-
-        // Removes doubles white spaces
-        str = str.replaceAll("\\s+", " ");
-
-        if(str.length() > 1){
-            // Remove extra white space at the end
-            if(str.charAt(str.length()-1)==' '){
-                str = str.substring(0, str.length()-1);
-            }
-            // Remove extra white space at the beginning
-            if(str.charAt(0)==' '){
-                str = str.substring(1, str.length());
-            }
-        }
-
-        return str;
-    }
-
-    /**
      * Cast the normalized text into a Mesa Object
      *
      * @param text - text cleaned and normalized from the Examenes PDF
      * @param dateStr - String from the Mesa's date in the format: (yyyy-MM-dd)
      * @return      Mesa object
      */
-    private Mesa extractMesa(String text, String dateStr) throws ParseException{
+    public Mesa extractMesa(String text, String dateStr) throws ParseException{
 
         // Transform date from String to Date
-        DateFormat mesaDateFormat = new SimpleDateFormat("yyyy-MM-dd");
-        mesaDateFormat.setTimeZone(TimeZone.getTimeZone("America/Argentina/Buenos_Aires"));
+        DateFormat mesaDateFormat = new SimpleDateFormat(DATE_FORMAT);
+        mesaDateFormat.setTimeZone(TimeZone.getTimeZone(TIMEZONE));
 
         Date mesaDate = mesaDateFormat.parse(dateStr);
 
         // Parse text to Examenes
-        ParseHelper helper = new ParseHelper();
+        MesaParseHelper helper = new MesaParseHelper();
         helper.setLines(Arrays.asList(text.split(System.getProperty("line.separator"))));
 
         Mesa mesa = new Mesa();
@@ -317,7 +295,7 @@ public class MesasExtractor {
         }
 
         mesa.setFecha(mesaDate);
-        ArrayList<Examen> examenes = new ParseHelperLogic().getExamenes(helper, dateStr);
+        ArrayList<Examen> examenes = new MesaParseHelperLogic().getExamenes(helper, dateStr);
         for(Examen examen : examenes){
             examen.setMesa(mesa);
         }

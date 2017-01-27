@@ -11,7 +11,6 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
 import java.util.TimeZone;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -36,10 +35,13 @@ public class ParseHelperLogic {
 
         ArrayList<Examen> examenes = new ArrayList<>();
         for(ParseHelper especialidadHelper : helper.getChilds() ){
+            logger.debug(especialidadHelper.getName());
 
             for(ParseHelper aulaHelper : especialidadHelper.getChilds() ){
+                logger.debug(aulaHelper.getName());
 
                 for(ParseHelper examenHelper : aulaHelper.getChilds() ){
+                    logger.debug(examenHelper.getName());
 
                     examenes.add(buildExamen(especialidadHelper.getName(), aulaHelper.getName(),
                                              examenHelper.getName(), date));
@@ -59,58 +61,50 @@ public class ParseHelperLogic {
      */
     private ParseHelper processData(ParseHelper helper) throws ParseException{
         ArrayList<ParseHelper> helpers = new ArrayList<>();
-        List<String> splittedList= new ArrayList<>();
+        Matcher matcher;
 
-        String[] splitted = helper.getText().split(helper.getSplitPattern());
-        Pattern tempReGex = Pattern.compile(helper.getMatchPattern());
-        Matcher matcher = tempReGex.matcher(helper.getText());
+        int depth = helper.getDepth() + 1;
 
-        int lineCount = 0;
+        ParseHelper lastHelper = new ParseHelper(depth);
 
-        for(String line : splitted){
-            if(!line.isEmpty()){
-                lineCount++;
-                if(matcher.find()){
-                    splittedList.add(matcher.group(1) + line);
+        for(String line : helper.getLines()){
+            matcher = helper.getMatchPattern().matcher(line);
+            if(matcher.find()){
+
+                if (checkHelper(lastHelper) != null){
+                    helpers.add(lastHelper);
                 }
+
+                // Create helper and increment the depth by 1
+                depth = helper.getDepth() + 1;
+                lastHelper = new ParseHelper(depth);
+
+                // Set helper name
+                lastHelper.setName(matcher.group(1));
+
+            }else{
+                lastHelper.getLines().add(line);
             }
         }
 
-        // Handles edge case when an Especialidad is missing.
-        if(lineCount != splittedList.size()){
-            throw new ParseException("The match pattern doesn't correspond with the split pattern",0);
+        if (checkHelper(lastHelper) != null){
+            helpers.add(lastHelper);
         }
 
-        String[] lines;
-        StringBuilder stringBuilder;
-        for(String textPart :splittedList){
-
-            lines = textPart.split(System.getProperty("line.separator"));
-            stringBuilder = new StringBuilder();
-
-            // Create helper and increment the depth by 1
-            int depth = helper.getDepth() + 1;
-            ParseHelper ph = new ParseHelper(depth);
-
-            // Set helper name
-            ph.setName(lines[0]);
-
-            // Remove name from the line
-            for (int i = 1; i < lines.length; i++) {
-                stringBuilder.append(lines[i]).append(System.getProperty("line.separator"));
-            }
-
-            // Set helper text
-            ph.setText(stringBuilder.toString());
-
-            // End condition = max depth reached
-            if(ph.getDepth() <= ParseHelper.MAX_DEPTH){
-                ph = processData(ph);
-            }
-            helpers.add(ph);
-        }
         helper.setChilds(helpers);
         return helper;
+    }
+
+    private ParseHelper checkHelper(ParseHelper lastHelper) throws ParseException{
+
+        // Check for empty helper
+        if(lastHelper.getName() != null || !lastHelper.getLines().isEmpty()){
+            if(lastHelper.getDepth() <= ParseHelper.MAX_DEPTH){
+                lastHelper = processData(lastHelper);
+            }
+            return lastHelper;
+        }
+        return null;
     }
 
     /**
@@ -125,8 +119,7 @@ public class ParseHelperLogic {
     private Examen buildExamen(String especialidad, String aula, String examenStr, String dateStr) throws ParseException{
 
         // Extract hour
-        Pattern hoursPattern = Pattern.compile("(\\d{1,2}.\\d{2}.\\d{2})");
-        Matcher m = hoursPattern.matcher(examenStr);
+        Matcher m = ParseHelper.HOURS_REGEX.matcher(examenStr);
         String hourStr;
         if(m.find()){
             hourStr = m.group(1);

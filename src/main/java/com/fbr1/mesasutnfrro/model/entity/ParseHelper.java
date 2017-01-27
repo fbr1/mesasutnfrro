@@ -1,41 +1,49 @@
 package com.fbr1.mesasutnfrro.model.entity;
 
 import java.util.ArrayList;
+import java.util.List;
+import java.util.regex.Pattern;
 
 public class ParseHelper {
 
-    public static final int ESPECIALIDAD = 0;
-    public static final int AULA = 1;
-    public static final int EXAMEN = 2;
+    private static final int ESPECIALIDAD = 0;
+    private static final int AULA = 1;
+    private static final int EXAMEN = 2;
     public static final int MAX_DEPTH = 2;
 
+    public static final Pattern ESPECIALIDAD_REGEX = Pattern.compile("( ?(?:ISI|IE|IQ|IC|IM) ?)");
+
+    // Regex matching one or more aulas
+    public static final Pattern AULA_REGEX =
+            Pattern.compile("(?<!(?:\\.|:)|(?:\\.|:)\\d)([\\d{1,3}/]+\\d{1,3} ?|\\d{1,3} ?|SUM ?)(?!\\d(?:\\.|:)|(?:\\.|:))");
+
+    // Regex matching aula in line.
+    // i.e: "308"
+    public static final Pattern AULA_LINE_REGEX = Pattern.compile("(^\\d{2,3}|SUM)$");
+
+    // Regex matching a line with only the time
+    public static final Pattern HOURS_LINE_REGEX = Pattern.compile("(^\\d{1,2}.\\d{2}.\\d{2}$)");
+
+    // Regex matching "<DAY> <DAYNUMBER> DE <MONTH> DE <YEAR>"
+    public static final Pattern DATE_REGEX =
+            Pattern.compile("(?<day>[a-zA-Z]+) (?<daynumber>\\d{1,2}) DE (?<month>[a-zA-Z]+) DE (?<year>\\d{4})");
+
+    public static final Pattern HOURS_REGEX = Pattern.compile("(\\d{1,2}.\\d{2}.\\d{2})");
+
+
     private int depth;
-    private String text;
     private String name;
-    private ArrayList<ParseHelper> childs;
+    private List<String> lines;
+    private List<ParseHelper> childs;
 
-
-    public String getSplitPattern(){
+    public Pattern getMatchPattern(){
         switch(this.depth){
             case ParseHelper.ESPECIALIDAD:
-                return "(?:ISI|IE|IQ|IC|IM)\\n";
+                return ESPECIALIDAD_REGEX;
             case ParseHelper.AULA:
-                return "(?<!\\.|:)(?:(?:\\d{2,3})(?:\\/\\d{1,3})*|SUM)\\n(?!\\.|:)";
+                return AULA_REGEX;
             case ParseHelper.EXAMEN:
-                return System.getProperty("line.separator");
-            default:
-                return null;
-        }
-    }
-
-    public String getMatchPattern(){
-        switch(this.depth){
-            case ParseHelper.ESPECIALIDAD:
-                return "((?:ISI|IE|IQ|IC|IM)\\n)";
-            case ParseHelper.AULA:
-                return "(?<!\\.|:)((?:(?:\\d{2,3})(?:\\/\\d{1,3})*|SUM)\\n)(?!\\.|:)";
-            case ParseHelper.EXAMEN:
-                return "()";
+                return Pattern.compile("(.+)");
             default:
                 return null;
         }
@@ -43,9 +51,11 @@ public class ParseHelper {
 
     public ParseHelper() {
         this.depth = 0;
+        lines = new ArrayList<>();
     }
 
     public ParseHelper(int depth) {
+        this();
         this.depth = depth;
     }
 
@@ -65,19 +75,19 @@ public class ParseHelper {
         this.name = name;
     }
 
-    public String getText() {
-        return text;
-    }
-
-    public void setText(String text) {
-        this.text = text;
-    }
-
-    public ArrayList<ParseHelper> getChilds() {
+    public List<ParseHelper> getChilds() {
         return childs;
     }
 
     public void setChilds(ArrayList<ParseHelper> childs) {
         this.childs = childs;
+    }
+
+    public List<String> getLines() {
+        return lines;
+    }
+
+    public void setLines(List<String> lines) {
+        this.lines = lines;
     }
 }

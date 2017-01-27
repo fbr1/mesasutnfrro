@@ -65,9 +65,6 @@ public class MesasExtractor {
      */
     public String cleanText(String oriText) throws ParseException{
 
-        // Regex matching "<DAY> <DAYNUMBER> DE <MONTH> DE <YEAR>"
-        Pattern dateRegex = Pattern.compile("(?<day>[a-zA-Z]+) (?<daynumber>\\d{1,2}) DE (?<month>[a-zA-Z]+) DE (?<year>\\d{4})");
-
         // Remove text containing 1-Mañana, 2-Tarde y 3-Noche
         oriText = Pattern.compile("(?:\\d-)?(?:Ma\\p{L}ana*|Tarde\\p{L}*|Noche\\p{L}*)",
                 Pattern.CASE_INSENSITIVE).matcher(oriText).replaceAll("");
@@ -113,7 +110,7 @@ public class MesasExtractor {
 
             // Extract Año de llamado and Mesa Date
             if (!dateFound){
-                Matcher matcher = dateRegex.matcher(line);
+                Matcher matcher = ParseHelper.DATE_REGEX.matcher(line);
 
                 if(matcher.find()){
                     mesaDate = parseDate(matcher.group("daynumber"), matcher.group("month"), matcher.group("year"));
@@ -165,27 +162,13 @@ public class MesasExtractor {
     private String normalizeText(List<String> lines){
         StringBuilder stringBuilder = new StringBuilder();
 
-        // Regex for especialidades
-        Pattern especialidadRegex = Pattern.compile("( ?(?:ISI|IE|IQ|IC|IM) ?)");
-
-        // Regex matching one or more aulas
-        Pattern aulaRegex = Pattern.compile("([\\d{1,3}/]+\\d{1,3} ?|\\d{1,3} ?|SUM )");
-
-        // Regex matching aula in line.
-        // i.e: "308"
-        Pattern aulaLineRegex = Pattern.compile("(^\\d{2,3}|SUM)$");
-
-        // Regex matching a line with only the time
-        Pattern hoursPattern = Pattern.compile("(^\\d{1,2}.\\d{2}.\\d{2}$)");
-
         for(int i = 0; i< lines.size(); i++){
 
             String line = lines.get(i);
 
             boolean skip = false;
 
-            // Make all the data format homogeneous
-            Matcher matcher = especialidadRegex.matcher(line);
+            Matcher matcher = ParseHelper.ESPECIALIDAD_REGEX.matcher(line);
             boolean esEspecialidad = matcher.find();
             if(esEspecialidad){
 
@@ -204,9 +187,10 @@ public class MesasExtractor {
                 }
             }
 
-            matcher = aulaRegex.matcher(line);
+            matcher = ParseHelper.AULA_REGEX.matcher(line);
             boolean esAula = matcher.find();
             if(esAula) {
+
                 // If there is text after the aula, add a newline
                 // Example: "309 Analisis Matematico II" > "309\nAnalisis Matematico II"
                 if (matcher.group(1).contains(" ")) {
@@ -219,15 +203,15 @@ public class MesasExtractor {
                      *      308
                      *      309 Analisis Matematico II
                      */
-                    if(aulaLineRegex.matcher(line).find() && i-1 >=0 && i+1 < lines.size()){
+                    if(ParseHelper.AULA_LINE_REGEX.matcher(line).find() && i-1 >=0 && i+1 < lines.size()){
 
                         // If the next line matches aulaLineRegex, the next iteration handles it
-                        matcher = aulaLineRegex.matcher(lines.get(i + 1));
+                        matcher = ParseHelper.AULA_LINE_REGEX.matcher(lines.get(i + 1));
                         if (matcher.find()) {
                             skip = true;
                         }else{
                             // If the previous line matches aulaLineRegex, append it at the beginning of the line
-                            matcher = aulaLineRegex.matcher(lines.get(i - 1));
+                            matcher = ParseHelper.AULA_LINE_REGEX.matcher(lines.get(i - 1));
                             if (matcher.find()) {
                                 line = matcher.group(1) + "/" + line;
                             }
@@ -253,12 +237,12 @@ public class MesasExtractor {
             if(!esEspecialidad && !esAula){
                 if(i-1>=0){
                     // Check if the previous line has an Horario, if so append it after the Materia
-                    matcher = hoursPattern.matcher(lines.get(i-1));
+                    matcher = ParseHelper.HOURS_LINE_REGEX.matcher(lines.get(i-1));
                     if(matcher.find()){
                         line += " " + matcher.group(1);
                     }else if(i+1<lines.size()){
                         // Check if the next line has an Horario, if so append it after the Materia
-                        matcher = hoursPattern.matcher(lines.get(i+1));
+                        matcher = ParseHelper.HOURS_LINE_REGEX.matcher(lines.get(i+1));
                         if(matcher.find()){
                             line += " " + matcher.group(1);
                             i++;
@@ -320,7 +304,7 @@ public class MesasExtractor {
 
         // Parse text to Examenes
         ParseHelper helper = new ParseHelper();
-        helper.setText(text);
+        helper.setLines(Arrays.asList(text.split(System.getProperty("line.separator"))));
 
         Mesa mesa = new Mesa();
 

@@ -15,4 +15,6 @@ public interface LlamadosRepository extends CrudRepository<Llamado, Long> {
 
     List<Llamado> findByAño(int año);
 
+    List<Llamado> findByWeekType(int weekType);
+
 }

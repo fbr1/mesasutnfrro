@@ -36,6 +36,14 @@ public class LlamadosLogic {
         return (List<Llamado>)llamadosRepository.findAll();
     }
 
+    public List<Llamado> getAllByWeekType(int weekType){
+
+        // Validate that weekType is within range
+        validateWeekType(weekType);
+
+        return llamadosRepository.findByWeekType(weekType);
+    }
+
     /**
      * Saves to DB the Llamado.
      * It replaces Materia objects from the Llamado with existing ones from the DB. If there are new
@@ -99,6 +107,21 @@ public class LlamadosLogic {
         llamado.setMesas(mesas);
 
         this.add(llamado);
+    }
+    /**
+     * Validate that the weekType is within range: [1, 2^n], where n is the number of weekdays(7)
+     *
+     * @param weekType - int
+     */
+    public static void validateWeekType(int weekType){
+
+        int min = 1;
+        double max = Math.pow(2, Mesa.WeekDay.values().length);
+
+        if(weekType < min || weekType > max){
+            throw new IllegalArgumentException("WeekType must be between " + min + " and " + max);
+        }
+
     }
 
     @Autowired

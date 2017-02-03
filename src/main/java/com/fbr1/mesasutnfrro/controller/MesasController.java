@@ -29,14 +29,12 @@ public class MesasController {
     final Logger logger = LoggerFactory.getLogger(com.fbr1.mesasutnfrro.controller.MesasController.class);
 
     @RequestMapping(value = "/updatemesas")
-    public String updatemesas(Model model) throws IOException, ParseException, MailchimpException {
-        String statusText = "no update";
+    public ResponseEntity updatemesas() throws IOException, ParseException, MailchimpException {
         if(updateLogic.isTimeForUpdate()){
-            updateLogic.checkUpdates();
-            statusText = "update";
+            updateLogic.checkUpdatesAndCrawl();
         }
-        model.addAttribute("statusText", statusText);
-        return "updatemesas";
+
+        return new ResponseEntity(HttpStatus.OK);
     }
 
     @PostMapping(value = "/subscribe")

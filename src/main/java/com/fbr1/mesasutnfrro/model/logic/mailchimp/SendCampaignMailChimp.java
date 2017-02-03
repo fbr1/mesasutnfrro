@@ -1,4 +1,4 @@
-package com.fbr1.mesasutnfrro.model.logic;
+package com.fbr1.mesasutnfrro.model.logic.mailchimp;
 
 import com.ecwid.maleorang.MailchimpMethod;
 import com.ecwid.maleorang.MailchimpObject;

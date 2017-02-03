@@ -41,7 +41,7 @@ public class UpdateLogic {
      * extracts the Llamado from the raw PDFs in the URLs and saves it.
      *
      */
-    public void checkUpdates() throws IOException, ParseException, MailchimpException {
+    public void checkUpdatesAndCrawl() throws IOException, ParseException, MailchimpException {
         if(isContentNew()){
 
             updateLlamadosFromURLs(this.urls);
@@ -49,9 +49,11 @@ public class UpdateLogic {
             // If all went well, store used URLs
             visitedURLsLogic.addAll(this.urls);
 
-            // Notify subscription users of new content
+            // Create Campaign
+            String campaign_id = subscribeLogic.createNewCampaign();
 
-            subscribeLogic.sendCampaign();
+            // Notify subscription users of new content
+            subscribeLogic.sendCampaign(campaign_id);
 
             logger.info("Add URLs: ", this.urls);
         }

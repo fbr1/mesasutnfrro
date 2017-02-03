@@ -78,4 +78,15 @@ public class Examen {
     public void setMesa(Mesa mesa) {
         this.mesa = mesa;
     }
+
+    @Override
+    public String toString() {
+        return "Examen{" +
+                "Id=" + Id +
+                ", fecha=" + fecha +
+                ", aula='" + aula + '\'' +
+                ", materia=" + materia +
+                ", mesa=" + mesa +
+                '}';
+    }
 }

@@ -10,6 +10,7 @@ import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.TimeZone;
 import java.util.regex.Matcher;
@@ -18,17 +19,20 @@ public class MesaParseHelperLogic {
 
     static private final int HOUR_STR_LENGHT = 8;
     static private final String HOUR_STR_FILLER = "0";
+    private String dateStr;
 
-    private final Logger logger = LoggerFactory.getLogger(MesaParseHelperLogic.class);
+    private static final Logger logger = LoggerFactory.getLogger(MesaParseHelperLogic.class);
 
     /**
      * Returns a List of Examenes populated from unprocessed data in the ParseHelper
      *
-     * @param helper - ParseHelper object
-     * @param date - Mesa's date in string format (dd-MM-yy)
+     * @param text - string containing normalized and clean text from a Mesa's PDF
      * @return      List of Examenes
      */
-    public ArrayList<Examen> getExamenes(MesaParseHelper helper, String date) throws ParseException{
+    public ArrayList<Examen> buildAndGetExamenes(String text) throws ParseException{
+
+        MesaParseHelper helper = new MesaParseHelper();
+        helper.setLines(Arrays.asList(text.split(System.getProperty("line.separator"))));
 
         helper = processData(helper);
 
@@ -43,7 +47,7 @@ public class MesaParseHelperLogic {
                     logger.debug(examenHelper.getName());
 
                     examenes.add(buildExamen(especialidadHelper.getName(), aulaHelper.getName(),
-                                             examenHelper.getName(), date));
+                                             examenHelper.getName(), dateStr));
                 }
             }
         }
@@ -148,5 +152,25 @@ public class MesaParseHelperLogic {
         Date fecha = examenDateFormat.parse(hourStr);
 
         return new Examen(fecha, aula, materia);
+    }
+
+    /**
+     * @param dateStr - Mesa's date in string format (yyyy-MM-dd)
+     */
+    public void setDateStr(String dateStr) {
+        this.dateStr = dateStr;
+    }
+
+    public MesaParseHelperLogic() {
+
+    }
+
+    /**
+     * Constructor
+     *
+     * @param dateStr - Mesa's date in string format (yyyy-MM-dd)
+     */
+    public MesaParseHelperLogic(String dateStr) {
+        this.dateStr = dateStr;
     }
 }

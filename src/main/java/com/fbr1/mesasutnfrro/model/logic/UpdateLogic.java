@@ -78,7 +78,7 @@ public class UpdateLogic {
                 PDDocument pdd = PDDocument.load(is);
 
                 // Extract mesa
-                Mesa mesa = mesasExtractor.processPDF(pdd);
+                Mesa mesa = mesasExtractor.buildMesaFromPDF(pdd);
                 mesas.add(mesa);
             }
         }

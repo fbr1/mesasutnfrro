@@ -138,14 +138,8 @@ public class MesasExtractorTest {
 
     }
 
-    @Test
-    public void parseDateWithError() throws ParseException{
-        try {
+    @Test(expected=ParseException.class)
+    public void parseDateWithError() throws ParseException {
             new MesasExtractor().parseDate("15", "JUPITER", "2015");
-            Assert.fail();
-        }catch(ParseException e){
-
-        }
-
     }
 }

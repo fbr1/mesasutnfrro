@@ -26,7 +26,7 @@ public class MesasExtractor {
     private int nroLlamado = 0;
     private int añoLlamado = 0;
     private String mesaDay = null;
-    private String mesaDate = null;
+    private String mesaDateStr = null;
 
     private static final Map<String, String> monthsMap = new HashMap<>();
     static{
@@ -46,19 +46,19 @@ public class MesasExtractor {
     }
 
     /**
-     * Extracts a Mesa from the given pdf
+     * Builds a Mesa from the given pdf
      *
      * @param pdd - PDDocument pdf document containing Examanes
      * @return      Mesa extracted from the pdf document
      */
-    public Mesa processPDF(PDDocument pdd) throws IOException, ParseException{
+    public Mesa buildMesaFromPDF(PDDocument pdd) throws IOException, ParseException{
 
         PDFTextStripper stripper = new PDFTextStripper();
         String text=normalizeText(cleanText(stripper.getText(pdd)));
         
         pdd.close();
 
-        return extractMesa(text, this.mesaDate);
+        return extractMesa(text);
     }
 
     /**
@@ -89,8 +89,6 @@ public class MesasExtractor {
                 continue;
             }
 
-            boolean remove = false;
-
             // Remove Title
             if (!titleFound && line.toLowerCase().contains("DISTRIBUCION DE AULAS".toLowerCase()) ){
                 titleFound = true;
@@ -117,7 +115,7 @@ public class MesasExtractor {
                 Matcher matcher = MesaParseHelper.DATE_REGEX.matcher(line);
 
                 if(matcher.find()){
-                    mesaDate = parseDate(matcher.group("daynumber"), matcher.group("month"), matcher.group("year"));
+                    mesaDateStr = parseDate(matcher.group("daynumber"), matcher.group("month"), matcher.group("year"));
 
                     mesaDay = matcher.group("day");
 
@@ -269,21 +267,11 @@ public class MesasExtractor {
      * Cast the normalized text into a Mesa Object
      *
      * @param text - text cleaned and normalized from the Examenes PDF
-     * @param dateStr - String from the Mesa's date in the format: (yyyy-MM-dd)
      * @return      Mesa object
      */
-    public Mesa extractMesa(String text, String dateStr) throws ParseException{
+    public Mesa extractMesa(String text) throws ParseException{
 
-        // Transform date from String to Date
-        DateFormat mesaDateFormat = new SimpleDateFormat(DATE_FORMAT);
-        mesaDateFormat.setTimeZone(TimeZone.getTimeZone(TIMEZONE));
-
-        Date mesaDate = mesaDateFormat.parse(dateStr);
-
-        // Parse text to Examenes
-        MesaParseHelper helper = new MesaParseHelper();
-        helper.setLines(Arrays.asList(text.split(System.getProperty("line.separator"))));
-
+        // Create mesa
         Mesa mesa = new Mesa();
 
         // Set WeekDay
@@ -294,8 +282,16 @@ public class MesasExtractor {
             }
         }
 
+        // Transform date from String to Date
+        DateFormat mesaDateFormat = new SimpleDateFormat(DATE_FORMAT);
+        mesaDateFormat.setTimeZone(TimeZone.getTimeZone(TIMEZONE));
+        Date mesaDate = mesaDateFormat.parse(mesaDateStr);
+
         mesa.setFecha(mesaDate);
-        ArrayList<Examen> examenes = new MesaParseHelperLogic().getExamenes(helper, dateStr);
+
+        // Parse text to Examenes
+        ArrayList<Examen> examenes = new MesaParseHelperLogic(mesaDateStr).buildAndGetExamenes(text);
+
         for(Examen examen : examenes){
             examen.setMesa(mesa);
         }

@@ -1,5 +1,6 @@
 package com.fbr1.mesasutnfrro.model.logic;
 
+import com.fbr1.mesasutnfrro.model.entity.Mesa;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.internal.runners.statements.Fail;
@@ -10,6 +11,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 public class MesasExtractorTest {
 
@@ -142,4 +144,16 @@ public class MesasExtractorTest {
     public void parseDateWithError() throws ParseException {
             new MesasExtractor().parseDate("15", "JUPITER", "2015");
     }
+
+    @Test
+    public void parseWeekDaySuccessfully() throws ParseException {
+        Mesa.WeekDay weekDay = new MesasExtractor().parseWeekDay("Jueves");
+        assertTrue(weekDay.getWeekDayValue() == 8);
+    }
+
+    @Test(expected=ParseException.class)
+    public void parseWeekDayWithError() throws ParseException {
+        Mesa.WeekDay weekDay = new MesasExtractor().parseWeekDay("Carroza");
+    }
+
 }

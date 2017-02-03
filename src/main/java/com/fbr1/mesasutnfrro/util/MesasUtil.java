@@ -1,5 +1,7 @@
 package com.fbr1.mesasutnfrro.util;
 
+import java.text.Collator;
+
 public class MesasUtil {
     /**
      * Removes white spaces at the beginning and end of a String.
@@ -25,5 +27,18 @@ public class MesasUtil {
         }
 
         return str;
+    }
+
+    public static boolean equalsStringIgnoringAccents(String str1, String str2){
+        final Collator instance = Collator.getInstance();
+
+        // Ignore Accents
+        instance.setStrength(Collator.NO_DECOMPOSITION);
+
+        if (instance.compare(str1, str2) == 0){
+            return true;
+        }else{
+            return false;
+        }
     }
 }

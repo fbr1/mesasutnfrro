@@ -275,12 +275,7 @@ public class MesasExtractor {
         Mesa mesa = new Mesa();
 
         // Set WeekDay
-        for(Mesa.WeekDay weekDay : Mesa.WeekDay.values()){
-            if (weekDay.name().equals(mesaDay)){
-                mesa.setWeekDay(weekDay);
-                break;
-            }
-        }
+        mesa.setWeekDay(parseWeekDay(mesaDay));
 
         // Transform date from String to Date
         DateFormat mesaDateFormat = new SimpleDateFormat(DATE_FORMAT);
@@ -298,6 +293,24 @@ public class MesasExtractor {
         mesa.setExamenes(examenes);
 
         return mesa;
+    }
+    /**
+     * Parse the corresponding WeekDay from the given String
+     *
+     * @param mesaDay - String containing the Mesa's day of the week
+     * @return      WeekDay object
+     */
+    public Mesa.WeekDay parseWeekDay(String mesaDay) throws ParseException {
+
+        for(Mesa.WeekDay weekDay : Mesa.WeekDay.values()){
+            if (MesasUtil.equalsStringIgnoringAccents(weekDay.name(), mesaDay)){
+                return weekDay;
+            }
+        }
+
+        // If doesn't return a WeekDay throw exception
+        throw new ParseException("The mesaDay given: " + mesaDay + "doesn't correspond to an existing weekDay", 0);
+
     }
 
     public int getNroLlamado() {

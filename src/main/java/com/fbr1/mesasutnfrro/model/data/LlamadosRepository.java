@@ -1,7 +1,9 @@
 package com.fbr1.mesasutnfrro.model.data;
 
 import com.fbr1.mesasutnfrro.model.entity.Llamado;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
+import org.springframework.data.repository.query.Param;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
@@ -16,5 +18,9 @@ public interface LlamadosRepository extends CrudRepository<Llamado, Long> {
     List<Llamado> findByAño(int año);
 
     List<Llamado> findByWeekType(int weekType);
+
+    @Query("select case when (count(llamado) > 0)  then true else false end " +
+            "from Llamado llamado where llamado.año = :año and llamado.numero = :numero")
+    boolean existsByAñoAndNumber(@Param("año") int año, @Param("numero") int numero);
 
 }

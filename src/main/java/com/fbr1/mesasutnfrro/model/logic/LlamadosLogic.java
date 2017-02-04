@@ -53,6 +53,12 @@ public class LlamadosLogic {
      */
     public void add(Llamado llamado){
 
+        // Check if the Llamado already exists
+        if(llamadosRepository.existsByAñoAndNumber(llamado.getAño(), llamado.getNumero())){
+            logger.info("The Llamado | Año: "+ llamado.getAño() + " Numero: " + llamado.getNumero() + " already exists");
+            return;
+        }
+
         // Extract all unique materias
         Set<Materia> materiasSeen = new HashSet<>();
 

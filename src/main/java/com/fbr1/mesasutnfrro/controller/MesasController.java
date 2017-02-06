@@ -37,6 +37,19 @@ public class MesasController {
         return new ResponseEntity(HttpStatus.OK);
     }
 
+    @GetMapping(value = "/")
+    public String home(Model model) throws JsonProcessingException {
+        Llamado llamado = llamadosLogic.getlastLlamado();
+
+        // Convert to JSON
+        ObjectMapper mapper = new ObjectMapper();
+        String jsonData = mapper.writeValueAsString(llamado);
+
+        model.addAttribute("data",jsonData);
+        return "index";
+    }
+
+
     @PostMapping(value = "/subscribe")
     public ResponseEntity subscribe(@Valid SubscribeForm subscribeForm, BindingResult bindingResult)
         throws IOException, MailchimpException{

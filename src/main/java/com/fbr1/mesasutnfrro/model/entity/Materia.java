@@ -7,7 +7,6 @@ import javax.persistence.*;
 
 @Entity
 @Table(name="materias")
-@JsonIdentityInfo(generator=ObjectIdGenerators.PropertyGenerator.class, property="id")
 public class Materia {
 
     @Id

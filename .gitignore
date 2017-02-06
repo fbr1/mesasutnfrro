@@ -45,4 +45,4 @@ target/
 
 # Custom
 /src/main/resources/mesasutnfrro/node_modules/
-/src/main/resources/static/
+/src/main/resources/static/node_modules/

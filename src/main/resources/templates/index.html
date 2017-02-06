@@ -1,0 +1,182 @@
+<!DOCTYPE HTML>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity4">
+<head>
+    <title>UTN FRRo Mesas</title>
+    <meta charset="UTF-8"/>
+    <link type="text/css" href="http://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet"/>
+    <link type="text/css" rel="stylesheet" media="screen"
+          th:href="@{/css/materialize.css}" />
+    <link type="text/css" rel="stylesheet" media="screen"
+          th:href="@{/css/mesasutnfrro.css}" />
+    <meta name="_csrf" th:content="${_csrf.token}"/>
+    <!-- default header name is X-CSRF-TOKEN -->
+    <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <link rel="icon" type="image/x-icon"  th:href="@{/icon.ico}">
+</head>
+
+<body>
+<!-- Barra de navegación -->
+<nav>
+    <div class="nav-wrapper light-blue accent-4 ">
+        <a href="#" class="center brand-logo">UTN FRRo Mesas</a>
+        <a href="#" data-activates="mobile-demo" class="button-collapse">
+            <i class="material-icons">menu</i>
+        </a>
+        <ul id="nav-mobile" class="right hide-on-med-and-down">
+            <li>
+                <a href="#modalSubscribe" class="modal-trigger">Subscribirse</a>
+            </li>
+            <li>
+                <form sec:authorize="isAuthenticated()" action="#" th:action="@{/logout}" method="post">
+                    <button class="waves-effect waves-light btn" type="submit">Sign Out</button>
+                </form>
+                <a sec:authorize="!isAuthenticated()" class="waves-effect waves-light btn modal-trigger" href="#modalLogin">Sign in</a>
+
+            </li>
+        </ul>
+        <ul class="side-nav" id="mobile-demo">
+            <li>
+                <a href="#modalSubscribe" class="blue-text text-darken-2 modal-trigger">Subscribirse</a>
+            </li>
+            <li>
+                <form sec:authorize="isAuthenticated()" action="#" th:action="@{/logout}" method="post">
+                    <button class="waves-effect waves-light btn" type="submit">Sign Out</button>
+                </form>
+                <a sec:authorize="!isAuthenticated()" class="waves-effect waves-light btn modal-trigger" href="#modalLogin">Sign in</a>
+
+            </li>
+        </ul>
+    </div>
+</nav>
+<section id="container" class="container">
+    <div class="card grey lighten-4">
+        <div class="card-content">
+            <h1>
+                <span class="card-title" data-bind="text: 'Llamado a examen número ' + numero() + '. Año ' + año()"></span>
+            </h1>
+        </div>
+        <div class="card-action">
+            <div id="filtros" class="row">
+                <div class="input-field col s12 m3" >
+                    <select id="filtroEspecialidad" data-bind="options: opcionesEspecialidad,
+                                        optionsText:  function(item) {return item.especialidad;},
+                                        value: filtroEspecialidad,
+                                        event: {change: setCookieEspecialidad}">
+                        <option value="" selected="selected">Todas</option>
+                        <option value="ISI">Ingeniería en sistemas</option>
+                        <option value="IQ">Ingeniería química</option>
+                        <option value="IM">Ingeniería mecánica</option>
+                        <option value="IC">Ingeniería civil</option>
+                        <option value="IE">Ingeniería eléctrica</option>
+                    </select>
+                    <label>Especialidad</label>
+                </div>
+                <div class="input-field col s12 m3">
+                    <input name="Busqueda" placeholder="Comience a escribir..." id="filtroMateria" type="text" class="validate" data-bind="textInput: $root.filtroMateria" />
+                    <label for="filtroMateria">Materia</label>
+                </div>
+            </div>
+            <div class="chip" data-bind="text: filtroEspecialidad().especialidad, visible : filtroEspecialidad()" style="display: none">
+            </div>
+            <div class="chip" data-bind="text: filtroMateria(), visible: filtroMateria()" style="display: none">
+            </div>
+        </div>
+    </div>
+    <div id="loader">
+        <div class="loader">
+            <span class="dot dot_1"></span>
+            <span class="dot dot_2"></span>
+            <span class="dot dot_3"></span>
+            <span class="dot dot_4"></span>
+        </div>
+    </div>
+    <div id="mesas" data-bind="foreach: mesas, visible: mesas().length > 0" style="display: none">
+        <!--ko if: examenesFiltrados().length > 0-->
+        <ul class="collection with-header z-depth-2">
+            <li class="collection-header">
+                <h5>Mesa día <span data-bind="text: fechaFormateada()"></span></h5>
+            </li>
+
+            <li class="collection-item">
+                <table class="striped">
+                    <thead>
+                    <tr>
+                        <th data-field="materia">Materia</th>
+                        <th data-field="especialidad">Especialidad</th>
+                        <th data-field="aula">Aula</th>
+                        <th data-field="fecha">Hora</th>
+                    </tr>
+                    </thead>
+
+                    <tbody data-bind="foreach: examenesFiltrados">
+                    <tr data-bind="visible: pasaFiltros()">
+                        <td data-bind="text: materia.nombre()"></td>
+                        <td data-bind="text: materia.especialidad()"></td>
+                        <td data-bind="text: aula()"></td>
+                        <td data-bind="text: fechaFormateada()"></td>
+                    </tr>
+                    </tbody>
+                </table>
+            </li>
+        </ul>
+        <!--/ko-->
+    </div>
+    <!-- Modal Login -->
+    <div sec:authorize="!isAuthenticated()" id="modalLogin" class="modal">
+        <form th:action="@{/login}" method="post">
+            <div class="modal-content">
+                <h4>Login</h4>
+                <div class="row">
+                    <div class="col s12">
+                        <div class="input-field">
+                            <input id="username" name="username" type="text" class="focus validate">
+                            <label for="username">User</label>
+                        </div>
+                        <div class="input-field">
+                            <input id="password" name="password" type="password" class="validate">
+                            <label for="password">Password</label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="submit" class=" modal-action modal-close waves-effect waves-green btn-flat">Sign in</button>
+            </div>
+        </form>
+    </div>
+    <div sec:authorize="!isAuthenticated()" id="modalSubscribe" class="modal">
+        <form data-bind="submit: subscribe" method="post">
+            <div class="modal-content">
+                <h5>Subscribite para enterarte de nuevas mesas</h5>
+                <div class="row">
+                    <div class="col s12">
+                        <div class="input-field">
+                            <input placeholder="mail@example.com" id="email" name="email" type="email" class="focus validate" required>
+                            <label for="email">Dirección de correo electrónico</label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer center-align ">
+                <button type="submit" class="modal-action waves-effect btn">Subscribirse</button>
+            </div>
+            <div id="loader_subscripcion" class="progress" style="visibility:hidden">
+                <div class="indeterminate"></div>
+            </div>
+        </form>
+    </div>
+</section>
+
+<script type="application/json" th:inline="javascript" id="data">
+    [(${data})]
+</script>
+<script type="text/javascript" th:src="@{/js/jquery-2.2.3.min.js}"></script>
+<script type="text/javascript" th:src="@{/js/materialize.js}"></script>
+<script type="text/javascript" th:src="@{/js/ko.js}"></script>
+<script type="text/javascript" th:src="@{/js/knockout.mapping-latest.debug.js}"></script>
+<script type="text/javascript" th:src="@{/js/jquery.mark.min.js}"></script>
+<script type="text/javascript" th:src="@{/js/jquery.cookie.js}"></script>
+<script type="text/javascript" th:src="@{/js/mesasutnfrro.js}"></script>
+</body>
+</html>

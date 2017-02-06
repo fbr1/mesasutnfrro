@@ -1,1 +1,0 @@
-export const EDIT_EXAMEN = 'llamado/EDIT_EXAMEN';

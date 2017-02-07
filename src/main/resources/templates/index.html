@@ -130,11 +130,11 @@
                 <div class="row">
                     <div class="col s12">
                         <div class="input-field">
-                            <input id="username" name="username" type="text" class="focus validate">
+                            <input id="username" name="username" type="text" class="focus validate" required>
                             <label for="username">User</label>
                         </div>
                         <div class="input-field">
-                            <input id="password" name="password" type="password" class="validate">
+                            <input id="password" name="password" type="password" class="validate" required>
                             <label for="password">Password</label>
                         </div>
                     </div>
@@ -178,5 +178,10 @@
 <script type="text/javascript" th:src="@{/js/jquery.mark.min.js}"></script>
 <script type="text/javascript" th:src="@{/js/jquery.cookie.js}"></script>
 <script type="text/javascript" th:src="@{/js/mesasutnfrro.js}"></script>
+<script th:if="${loginError}" type="text/javascript">
+    $(document).ready(function() {
+        $('#modalLogin').modal('open');
+    });
+</script>
 </body>
 </html>

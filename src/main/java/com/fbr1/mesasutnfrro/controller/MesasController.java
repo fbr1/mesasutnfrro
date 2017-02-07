@@ -38,7 +38,9 @@ public class MesasController {
     }
 
     @GetMapping(value = "/")
-    public String home(Model model) throws JsonProcessingException {
+    public String home(@RequestParam(value = "error", defaultValue = "false") boolean error, Model model) throws JsonProcessingException {
+        model.addAttribute("loginError", error);
+
         Llamado llamado = llamadosLogic.getlastLlamado();
 
         // Convert to JSON
@@ -53,6 +55,17 @@ public class MesasController {
     @PostMapping(value = "/subscribe")
     public ResponseEntity subscribe(@Valid SubscribeForm subscribeForm, BindingResult bindingResult)
         throws IOException, MailchimpException{
+        // TODO change
+        if(bindingResult.hasErrors()){
+            return new ResponseEntity(HttpStatus.BAD_REQUEST);
+        }
+        subscribeLogic.saveSubscriber(subscribeForm);
+        return new ResponseEntity(HttpStatus.OK);
+    }
+
+    @GetMapping(value = "/login_error")
+    public ResponseEntity login_error(@Valid SubscribeForm subscribeForm, BindingResult bindingResult)
+            throws IOException, MailchimpException{
         // TODO change
         if(bindingResult.hasErrors()){
             return new ResponseEntity(HttpStatus.BAD_REQUEST);

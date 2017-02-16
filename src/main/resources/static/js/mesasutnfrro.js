@@ -24,6 +24,18 @@ var mapping = {
 function Examen(data) {
     var self = this;
     ko.mapping.fromJS(data, mapping, self);
+
+    self.EditExamenDialog = function(item){
+        viewModel.selectedItem(item);
+
+        viewModel.showEditDialog(true);
+    };
+
+    self.savechanges = function() {
+       alert("saving " + ko.toJSON(self));
+       viewModel.selectedItem(null);
+
+    };
         
     self.pasaFiltros = ko.computed(function() {
         var pasaFiltroEspecialidad = function(especialidad) {
@@ -70,8 +82,40 @@ function Mesa(data) {
     }, self);
 }
 
+// http://stackoverflow.com/questions/22706765/twitter-bootstrap-3-modal-with-knockout
+
+ko.bindingHandlers.modal = {
+    init: function (element, valueAccessor) {
+        $(element).modal({
+            show: false
+        });
+
+        var value = valueAccessor();
+        if (typeof value === 'function') {
+            $(element).modal({
+                complete: function() { value(false); }
+            });
+        }
+
+    },
+    update: function (element, valueAccessor) {
+        var value = valueAccessor();
+        if (ko.utils.unwrapObservable(value)) {
+            $(element).modal('open');
+        } else {
+            $(element).modal('close');
+        }
+    }
+}
+
 function ViewModel(data, options) {
+
     var self = this;
+
+    self.selectedItem = ko.observable();
+
+    self.showEditDialog = ko.observable(false);
+
     var getEspecialidad = function() {
         var especialidad = "ALL";
         var especialidadFromCookie = $.cookie("especialidad");
@@ -112,8 +156,6 @@ function ViewModel(data, options) {
     self.mesas = self.mesas.sort(function(left, right) {
         return left.fecha() > right.fecha() ? 1 : -1;
     });
-
-
 
     self.subscribe = function(formElement) {
         var token = $("meta[name='_csrf']").attr("content");
@@ -164,6 +206,54 @@ function  iniMarkThings() {
         
     });
 }
+
+$(document).ready(function () {
+    iniMaterialThings();
+
+    // First Load
+    // Take inline data
+
+    $("#loader").show();
+    var data = JSON.parse(document.getElementById('data').innerHTML);
+    viewModel = new ViewModel(data, mapping);
+    ko.applyBindings(viewModel);
+    iniMarkThings();
+    $("#loader").hide();
+
+     $('.dropdown-button').dropdown({
+          inDuration: 300,
+          outDuration: 225,
+          constrainWidth: false, // Does not change width of dropdown to that of the activator
+          hover: false, // Activate on hover
+          gutter: 0, // Spacing from edge
+          belowOrigin: false, // Displays dropdown below the button
+          alignment: 'left', // Displays dropdown with edge aligned to the left of button
+          stopPropagation: false // Stops event propagation
+        }
+      );
+
+    // Old ajax request
+    
+//    var settings = {
+//        url: "/rest",
+//        dataType: "json",
+//        beforeSend: function(jqXHR, settings) {
+//            $("#loader").show();
+//        },
+//        success: function(data, status, jqXHR) {
+//            viewModel = new ViewModel(data, mapping);
+//            ko.applyBindings(viewModel);
+//            iniMarkThings();
+//        },
+//        error: function(jqXHR, status, error) {
+//            alert("Ocurrio un error al obtener los datos" + error.toString());
+//        },
+//        complete: function(jqXHR, status) {
+//            $("#loader").hide();
+//        }
+//    };
+//    $.ajax(settings);
+});
 
 function getDia(dayNumber) {
     var weekday = new Array(7);
@@ -314,41 +404,5 @@ function formatearHora(milisegundos) {
            return diacriticsMap[a] || a;
         });
     }
-
-$(document).ready(function () {
-    iniMaterialThings();
-
-    // First Load
-    // Take inline data
-
-    $("#loader").show();
-    var data = JSON.parse(document.getElementById('data').innerHTML);
-    viewModel = new ViewModel(data, mapping);
-    ko.applyBindings(viewModel);
-    iniMarkThings();
-    $("#loader").hide();
-
-    // Old ajax request
-    
-//    var settings = {
-//        url: "/rest",
-//        dataType: "json",
-//        beforeSend: function(jqXHR, settings) {
-//            $("#loader").show();
-//        },
-//        success: function(data, status, jqXHR) {
-//            viewModel = new ViewModel(data, mapping);
-//            ko.applyBindings(viewModel);
-//            iniMarkThings();
-//        },
-//        error: function(jqXHR, status, error) {
-//            alert("Ocurrio un error al obtener los datos" + error.toString());
-//        },
-//        complete: function(jqXHR, status) {
-//            $("#loader").hide();
-//        }
-//    };
-//    $.ajax(settings);
-});
 
 

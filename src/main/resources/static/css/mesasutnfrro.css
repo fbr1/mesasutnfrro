@@ -150,3 +150,10 @@ top: 90%;
 right: 0%;
 left: 0%;
 margin: 0 auto;} }
+
+/* dropdown on top of everything */
+
+.collection-mesas {
+  @extend .collection;
+  overflow: visible;
+}

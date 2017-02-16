@@ -93,7 +93,7 @@
     </div>
     <div id="mesas" data-bind="foreach: mesas, visible: mesas().length > 0" style="display: none">
         <!--ko if: examenesFiltrados().length > 0-->
-        <ul class="collection with-header z-depth-2">
+        <ul class="collection collection-mesas with-header z-depth-2">
             <li class="collection-header">
                 <h5>Mesa día <span data-bind="text: fechaFormateada()"></span></h5>
             </li>
@@ -106,6 +106,7 @@
                         <th data-field="especialidad">Especialidad</th>
                         <th data-field="aula">Aula</th>
                         <th data-field="fecha">Hora</th>
+                        <th sec:authorize="isAuthenticated()"></th>
                     </tr>
                     </thead>
 
@@ -115,6 +116,17 @@
                         <td data-bind="text: materia.especialidad()"></td>
                         <td data-bind="text: aula()"></td>
                         <td data-bind="text: fechaFormateada()"></td>
+                        <td sec:authorize="isAuthenticated()">
+                            <!-- Dropdown Trigger -->
+                            <a class='dropdown-button btn' href='#' data-bind="attr: { 'data-activates': 'opciones' + id() }" >Opciones</a>
+
+                            <!-- Dropdown Structure -->
+                            <ul data-bind="attr: { 'id': 'opciones' + id() }" class='dropdown-content'>
+                                <li><a href="#" data-bind="click: EditExamenDialog">Editar</a></li>
+                                <li class="divider"></li>
+                                <li><a href="#!">Borrar</a></li>
+                            </ul>
+                        </td>
                     </tr>
                     </tbody>
                 </table>
@@ -145,6 +157,7 @@
             </div>
         </form>
     </div>
+    <!-- Modal Subscribe -->
     <div sec:authorize="!isAuthenticated()" id="modalSubscribe" class="modal">
         <form data-bind="submit: subscribe" method="post">
             <div class="modal-content">
@@ -162,6 +175,40 @@
                 <button type="submit" class="modal-action waves-effect btn">Subscribirse</button>
             </div>
             <div id="loader_subscripcion" class="progress" style="visibility:hidden">
+                <div class="indeterminate"></div>
+            </div>
+        </form>
+    </div>
+    <!-- Modal Edit Examen -->
+    <div sec:authorize="isAuthenticated()" id="modalEditExamen" data-bind="with: selectedItem, modal:showEditDialog" class="modal" >
+        <form method="post">
+            <div class="modal-content">
+                <h5 data-bind="text "></h5>
+                <div class="row">
+                    <div class="col s12">
+                        <div class="input-field">
+                            <input data-bind="value: materia.nombre()" id="materia" name="materia" type="text" class="focus" required>
+                            <label for="materia">Materia</label>
+                        </div>
+                        <div class="input-field">
+                            <input data-bind="value: aula()" id="aula" name="aula" type="text" required>
+                            <label for="aula">Aula</label>
+                        </div>
+                        <div class="input-field">
+                            <input data-bind="value: materia.especialidad()" id="especialidad" name="especialidad" type="text" required>
+                            <label for="especialidad">Especialidad</label>
+                        </div>
+                        <div class="input-field">
+                            <input data-bind="value: fechaFormateada()" id="hora" name="hora" type="text" required>
+                            <label for="hora">Hora</label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer center-align ">
+                <button data-bind="click: savechanges" type="submit" class="modal-action waves-effect btn">Guardar</button>
+            </div>
+            <div id="loader_edit_examen" class="progress" style="visibility:hidden">
                 <div class="indeterminate"></div>
             </div>
         </form>

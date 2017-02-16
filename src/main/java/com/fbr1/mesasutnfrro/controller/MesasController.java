@@ -37,9 +37,35 @@ public class MesasController {
         return new ResponseEntity(HttpStatus.OK);
     }
 
+    @GetMapping(value = "/")
+    public String home(@RequestParam(value = "error", defaultValue = "false") boolean error, Model model) throws JsonProcessingException {
+        model.addAttribute("loginError", error);
+
+        Llamado llamado = llamadosLogic.getlastLlamado();
+
+        // Convert to JSON
+        ObjectMapper mapper = new ObjectMapper();
+        String jsonData = mapper.writeValueAsString(llamado);
+
+        model.addAttribute("data",jsonData);
+        return "index";
+    }
+
+
     @PostMapping(value = "/subscribe")
     public ResponseEntity subscribe(@Valid SubscribeForm subscribeForm, BindingResult bindingResult)
         throws IOException, MailchimpException{
+        // TODO change
+        if(bindingResult.hasErrors()){
+            return new ResponseEntity(HttpStatus.BAD_REQUEST);
+        }
+        subscribeLogic.saveSubscriber(subscribeForm);
+        return new ResponseEntity(HttpStatus.OK);
+    }
+
+    @GetMapping(value = "/login_error")
+    public ResponseEntity login_error(@Valid SubscribeForm subscribeForm, BindingResult bindingResult)
+            throws IOException, MailchimpException{
         // TODO change
         if(bindingResult.hasErrors()){
             return new ResponseEntity(HttpStatus.BAD_REQUEST);

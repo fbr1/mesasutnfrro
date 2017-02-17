@@ -7,6 +7,7 @@
     <groupId>com.fbr1.mesasutnfrro</groupId>
     <artifactId>mesasutnfrro</artifactId>
     <version>0.1</version>
+    <packaging>war</packaging>
 
     <parent>
         <groupId>org.springframework.boot</groupId>
@@ -128,7 +129,7 @@
                 <dependency>
                     <groupId>org.springframework.boot</groupId>
                     <artifactId>spring-boot-starter-tomcat</artifactId>
-                    <!--<scope>provided</scope>-->
+                    <scope>provided</scope>
                 </dependency>
             </dependencies>
         </profile>

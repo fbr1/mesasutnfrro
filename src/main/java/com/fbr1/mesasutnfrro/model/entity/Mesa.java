@@ -64,12 +64,12 @@ public class Mesa {
 
     public Mesa () {} // Required for json parser
 
-    public long getID() {
+    public long getId() {
         return Id;
     }
 
-    public void setID(long Id) {
-        this.Id = Id;
+    public void setId(long id) {
+        Id = id;
     }
 
     public WeekDay getWeekDay() {

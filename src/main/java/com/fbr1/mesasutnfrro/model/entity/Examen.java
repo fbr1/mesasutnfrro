@@ -39,11 +39,11 @@ public class Examen {
 
     public Examen() {} // Required for json parser
 
-    public long getID() {
+    public long getId() {
         return Id;
     }
 
-    public void setID(long Id) {
+    public void setId(long Id) {
         this.Id = Id;
     }
 

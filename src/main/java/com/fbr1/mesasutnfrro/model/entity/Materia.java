@@ -50,7 +50,7 @@ public class Materia {
         return Id;
     }
 
-    public void setID(long ID) {
+    public void setId(long Id) {
         this.Id = Id;
     }
 

@@ -54,8 +54,8 @@ public class MesasRESTService {
         oldExamen.setAula(examen.getAula());
         oldExamen.setFecha(examen.getFecha());
         Mesa mesaActual = oldExamen.getMesa();
-        if((examen.getMesa() != null) && (oldExamen.getMesa().getID() != examen.getMesa().getID())) {
-            Mesa mesaNueva = mesaRepository.findOne(examen.getMesa().getID());
+        if((examen.getMesa() != null) && (oldExamen.getMesa().getId() != examen.getMesa().getId())) {
+            Mesa mesaNueva = mesaRepository.findOne(examen.getMesa().getId());
             if (mesaNueva == null) {throw new ObjetoNotFoundException("La mesa a la cuál quiere cambiar el examen no existe");};
             mesaActual.getExamenes().remove(oldExamen);
             mesaNueva.getExamenes().add(oldExamen);

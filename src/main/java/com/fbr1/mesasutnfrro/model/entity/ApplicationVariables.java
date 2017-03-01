@@ -11,7 +11,7 @@ public class ApplicationVariables {
 
     @Id
     @Column(name = "id_application_vars")
-    private int ID;
+    private int Id;
 
     @Column(name = "lastupdate")
     private Long lastupdate;
@@ -23,12 +23,12 @@ public class ApplicationVariables {
 
     public ApplicationVariables(){}
 
-    public int getID() {
-        return ID;
+    public int getId() {
+        return Id;
     }
 
-    public void setID(int ID) {
-        this.ID = ID;
+    public void setId(int Id) {
+        this.Id = Id;
     }
 
     public Long getLastupdate() {

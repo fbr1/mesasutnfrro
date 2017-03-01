@@ -271,26 +271,22 @@ public class MesasExtractor {
      */
     public Mesa extractMesa(String text) throws ParseException{
 
-        // Create mesa
-        Mesa mesa = new Mesa();
-
-        // Set WeekDay
-        mesa.setWeekDay(parseWeekDay(mesaDay));
-
         // Transform date from String to Date
         DateFormat mesaDateFormat = new SimpleDateFormat(DATE_FORMAT);
         mesaDateFormat.setTimeZone(TimeZone.getTimeZone(TIMEZONE));
         Date mesaDate = mesaDateFormat.parse(mesaDateStr);
 
-        mesa.setFecha(mesaDate);
-
         // Parse text to Examenes
-        ArrayList<Examen> examenes = new MesaParseHelperLogic(mesaDateStr).buildAndGetExamenes(text);
+        Mesa mesa = new MesaParseHelperLogic(mesaDateStr).buildAndGetMesa(text);
 
-        for(Examen examen : examenes){
+        for(Examen examen : mesa.getExamenes()){
             examen.setMesa(mesa);
         }
-        mesa.setExamenes(examenes);
+
+        mesa.setFecha(mesaDate);
+
+        // Set WeekDay
+        mesa.setWeekDay(parseWeekDay(mesaDay));
 
         return mesa;
     }

@@ -16,6 +16,10 @@ import java.util.List;
 @JsonIdentityInfo(generator=ObjectIdGenerators.PropertyGenerator.class, property="id")
 public class Mesa {
 
+    public enum State {
+        INCOMPLETE, COMPLETE
+    }
+
     public enum WeekDay {
 
         LUNES(1),
@@ -57,12 +61,19 @@ public class Mesa {
     @JoinColumn(name = "id_llamado")
     private Llamado llamado;
 
+    @Enumerated(EnumType.STRING)
+    @Column(name="state")
+    private State state;
+
     public Mesa(Date fecha, List<Examen> examenes) {
+        this();
         this.fecha = fecha;
         this.examenes = examenes;
     }
 
-    public Mesa () {} // Required for json parser
+    public Mesa () {
+        this.state = State.COMPLETE;
+    } // Required for json parser
 
     public long getId() {
         return Id;
@@ -102,5 +113,14 @@ public class Mesa {
 
     public void setLlamado(Llamado llamado) {
         this.llamado = llamado;
+    }
+
+    @Enumerated(EnumType.STRING)
+    public State getState() {
+        return state;
+    }
+
+    public void setState(State state) {
+        this.state = state;
     }
 }

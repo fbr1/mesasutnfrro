@@ -2,6 +2,7 @@ package com.fbr1.mesasutnfrro.model.logic;
 
 import com.fbr1.mesasutnfrro.model.entity.Examen;
 import com.fbr1.mesasutnfrro.model.entity.Materia;
+import com.fbr1.mesasutnfrro.model.entity.Mesa;
 import com.fbr1.mesasutnfrro.model.entity.MesaParseHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,12 +25,14 @@ public class MesaParseHelperLogic {
     private static final Logger logger = LoggerFactory.getLogger(MesaParseHelperLogic.class);
 
     /**
-     * Returns a List of Examenes populated from unprocessed data in the ParseHelper
+     * Returns a Mesa object populated from unprocessed data in the ParseHelper
      *
      * @param text - string containing normalized and clean text from a Mesa's PDF
-     * @return      List of Examenes
+     * @return      Mesa with examenes and state
      */
-    public ArrayList<Examen> buildAndGetExamenes(String text) throws ParseException{
+    public Mesa buildAndGetMesa(String text) throws ParseException{
+
+        Mesa mesa = new Mesa();
 
         MesaParseHelper helper = new MesaParseHelper();
         helper.setLines(Arrays.asList(text.split(System.getProperty("line.separator"))));
@@ -46,13 +49,28 @@ public class MesaParseHelperLogic {
                 for(MesaParseHelper examenHelper : aulaHelper.getChilds() ){
                     logger.debug(examenHelper.getName());
 
-                    examenes.add(buildExamen(especialidadHelper.getName(), aulaHelper.getName(),
-                                             examenHelper.getName(), dateStr));
+                    if (examenHelper.getName() != null && especialidadHelper.getName() != null){
+                        examenes.add(buildExamen(especialidadHelper.getName(), aulaHelper.getName(),
+                                examenHelper.getName(), dateStr));
+                    }
+
+                    if(mesa.getState() != Mesa.State.INCOMPLETE){
+
+                        if(examenHelper.getName() == null || aulaHelper.getName() == null ||
+                                especialidadHelper.getName() == null){
+
+                            mesa.setState(Mesa.State.INCOMPLETE);
+
+                        }
+
+                    }
                 }
             }
         }
 
-        return examenes;
+        mesa.setExamenes(examenes);
+
+        return mesa;
     }
 
     /**

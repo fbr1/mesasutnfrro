@@ -34,6 +34,7 @@ public class MesaParseHelper {
 
     public static final Pattern HOURS_REGEX = Pattern.compile("(\\d{1,2}.\\d{2}.\\d{2})");
 
+    public static final Pattern EXAMEN_REGEX = Pattern.compile("(.+ \\d{1,2}.\\d{2}.\\d{2})");
 
     private int depth;
     private String name;
@@ -47,7 +48,7 @@ public class MesaParseHelper {
             case MesaParseHelper.AULA:
                 return AULA_REGEX;
             case MesaParseHelper.EXAMEN:
-                return Pattern.compile("(.+)");
+                return EXAMEN_REGEX;
             default:
                 return null;
         }

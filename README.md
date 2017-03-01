@@ -13,13 +13,3 @@ Set the following Environmental Variables:
 * Maven
 * Apache Tomcat
 * Mysql
-* Node.js
-
-## Instrucciones
-Una vez descargado el proyecto se debe:
-
-1. Configurar las variables de entorno especificadas anteriormente.
-
-2. Instalar las dependencias de Maven.
-
-3. Instalar las dependencias de de Node que se encuentran en el archivo package.json en resources/static.

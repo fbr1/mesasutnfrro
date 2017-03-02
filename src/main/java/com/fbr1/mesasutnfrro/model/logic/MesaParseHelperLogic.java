@@ -7,14 +7,16 @@ import com.fbr1.mesasutnfrro.model.entity.MesaParseHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.text.DateFormat;
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Date;
-import java.util.TimeZone;
 import java.util.regex.Matcher;
+
+import static java.time.ZoneOffset.UTC;
 
 public class MesaParseHelperLogic {
 
@@ -155,19 +157,18 @@ public class MesaParseHelperLogic {
         // Correct Edge Case when '.' is used instead of ':'
         hourStr = hourStr.replace(".",":");
 
-        // Transform hourStr from String to Date
-        DateFormat examenDateFormat = new SimpleDateFormat(MesasExtractor.DATE_HOUR_FORMAT);
-        examenDateFormat.setTimeZone(TimeZone.getTimeZone(MesasExtractor.TIMEZONE));
-
         // Add a 0 to the left if there is one missing.
         // Example: 5:00:00 -> 05:00:00
         if(hourStr.length() < HOUR_STR_LENGHT ){
             hourStr = HOUR_STR_FILLER + hourStr;
         }
 
-        hourStr = dateStr + " " + hourStr;
+        String fullDateStr = dateStr + " " + hourStr;
 
-        Date fecha = examenDateFormat.parse(hourStr);
+        // Parse hourStr and dateStr to ZonedDateTime in UTC
+        ZoneId argZone = ZoneId.of(MesasExtractor.TIMEZONE);
+        DateTimeFormatter argTimeFormatter = DateTimeFormatter.ofPattern(MesasExtractor.DATE_HOUR_FORMAT).withZone(argZone);
+        LocalDateTime fecha = ZonedDateTime.parse(fullDateStr, argTimeFormatter).withZoneSameInstant(UTC).toLocalDateTime();
 
         return new Examen(fecha, aula, materia);
     }

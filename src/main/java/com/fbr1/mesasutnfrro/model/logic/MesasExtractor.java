@@ -6,15 +6,19 @@ import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.text.PDFTextStripper;
 
 import java.io.*;
-import java.text.DateFormat;
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import static java.time.ZoneOffset.UTC;
 
 public class MesasExtractor {
 
@@ -272,9 +276,9 @@ public class MesasExtractor {
     public Mesa extractMesa(String text) throws ParseException{
 
         // Transform date from String to Date
-        DateFormat mesaDateFormat = new SimpleDateFormat(DATE_FORMAT);
-        mesaDateFormat.setTimeZone(TimeZone.getTimeZone(TIMEZONE));
-        Date mesaDate = mesaDateFormat.parse(mesaDateStr);
+        ZoneId argZone = ZoneId.of(MesasExtractor.TIMEZONE);
+        DateTimeFormatter argTimeFormatter = DateTimeFormatter.ofPattern(DATE_FORMAT).withZone(argZone);
+        LocalDate mesaDate = ZonedDateTime.parse(mesaDateStr, argTimeFormatter).withZoneSameInstant(UTC).toLocalDate();
 
         // Parse text to Examenes
         Mesa mesa = new MesaParseHelperLogic(mesaDateStr).buildAndGetMesa(text);

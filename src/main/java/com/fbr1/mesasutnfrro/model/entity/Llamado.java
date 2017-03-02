@@ -1,11 +1,10 @@
 package com.fbr1.mesasutnfrro.model.entity;
 
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 
 import javax.persistence.*;
-import java.util.Date;
+import java.time.LocalDate;
 import java.util.List;
 
 @Entity
@@ -25,7 +24,7 @@ public class Llamado{
     private int numero;
 
     @Column(name="date")
-    private Date date;
+    private LocalDate date;
 
     // This variable is the result of adding the values of the Llamado's Mesas' WeekDay
     // The goal of this is to be able to unequivocally determine the combination of days that forms the Llamado
@@ -35,14 +34,14 @@ public class Llamado{
     @OneToMany(mappedBy="llamado", fetch = FetchType.EAGER, cascade={CascadeType.ALL})
     private List<Mesa> mesas;
 
-    public Llamado(int año, int numero, Date date, List<Mesa> mesas) {
+    public Llamado(int año, int numero, LocalDate date, List<Mesa> mesas) {
         this.año = año;
         this.numero = numero;
         this.mesas = mesas;
         this.date = date;
     }
 
-    public Llamado(int año, int numero, Date date) {
+    public Llamado(int año, int numero, LocalDate date) {
         this.año = año;
         this.numero = numero;
         this.date = date;
@@ -58,11 +57,11 @@ public class Llamado{
         this.weekType = weekType;
     }
 
-    public Date getDate() {
+    public LocalDate getDate() {
         return date;
     }
 
-    public void setDate(Date date) {
+    public void setDate(LocalDate date) {
         this.date = date;
     }
 

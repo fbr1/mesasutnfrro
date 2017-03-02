@@ -3,6 +3,8 @@ package com.fbr1.mesasutnfrro.controller;
 import com.ecwid.maleorang.MailchimpException;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.fbr1.mesasutnfrro.model.entity.Llamado;
 import com.fbr1.mesasutnfrro.model.forms.SubscribeForm;
 import com.fbr1.mesasutnfrro.model.logic.LlamadosLogic;
@@ -45,6 +47,8 @@ public class MesasController {
 
         // Convert to JSON
         ObjectMapper mapper = new ObjectMapper();
+        mapper.registerModule(new JavaTimeModule());
+        mapper.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
         String jsonData = mapper.writeValueAsString(llamado);
 
         model.addAttribute("data",jsonData);

@@ -109,7 +109,10 @@
                     <thead>
                     <tr>
                         <th data-field="materia">Materia</th>
-                        <th data-field="especialidad">Especialidad</th>
+                        <th data-field="especialidad">
+                            <span class="hide-on-small-only">Especialidad</span>
+                            <span class="hide-on-med-and-up">Esp</span>
+                        </th>
                         <th data-field="aula">Aula</th>
                         <th data-field="fecha">Hora</th>
                         <th sec:authorize="isAuthenticated()"></th>

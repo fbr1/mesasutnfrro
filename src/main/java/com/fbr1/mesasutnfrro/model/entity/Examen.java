@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 
 import javax.persistence.*;
+import java.time.LocalDateTime;
 import java.util.Date;
 
 @Entity
@@ -18,7 +19,7 @@ public class Examen {
     private long Id;
 
     @Column(name="hora")
-    private Date fecha;
+    private LocalDateTime fecha;
 
     @Column(name="aula")
     private String aula;
@@ -31,7 +32,7 @@ public class Examen {
     @JoinColumn(name = "id_mesa")
     private Mesa mesa;
 
-    public Examen(Date fecha, String aula, Materia materia) {
+    public Examen(LocalDateTime fecha, String aula, Materia materia) {
         this.fecha = fecha;
         this.aula = aula;
         this.materia = materia;
@@ -47,11 +48,11 @@ public class Examen {
         this.Id = Id;
     }
 
-    public Date getFecha() {
+    public LocalDateTime getFecha() {
         return fecha;
     }
 
-    public void setFecha(Date fecha) {
+    public void setFecha(LocalDateTime fecha) {
         this.fecha = fecha;
     }
 

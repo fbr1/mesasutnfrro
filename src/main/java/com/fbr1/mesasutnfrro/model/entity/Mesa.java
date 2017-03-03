@@ -8,6 +8,7 @@ import com.fbr1.mesasutnfrro.util.WeekDayConverter;
 
 import javax.persistence.*;
 
+import java.time.LocalDate;
 import java.util.Date;
 import java.util.List;
 
@@ -48,7 +49,7 @@ public class Mesa {
     private long Id;
 
     @Column(name="fecha")
-    private Date fecha;
+    private LocalDate fecha;
 
     @Column(name="week_day")
     @Convert(converter = WeekDayConverter.class)
@@ -65,7 +66,7 @@ public class Mesa {
     @Column(name="state")
     private State state;
 
-    public Mesa(Date fecha, List<Examen> examenes) {
+    public Mesa(LocalDate fecha, List<Examen> examenes) {
         this();
         this.fecha = fecha;
         this.examenes = examenes;
@@ -91,11 +92,11 @@ public class Mesa {
         this.weekDay = weekDay;
     }
 
-    public Date getFecha() {
+    public LocalDate getFecha() {
         return fecha;
     }
 
-    public void setFecha(Date fecha) {
+    public void setFecha(LocalDate fecha) {
         this.fecha = fecha;
     }
 

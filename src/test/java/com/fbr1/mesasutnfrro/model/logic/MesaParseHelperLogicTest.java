@@ -5,6 +5,7 @@ import com.fbr1.mesasutnfrro.model.entity.Mesa;
 import org.junit.Test;
 
 import java.text.ParseException;
+import java.time.format.DateTimeParseException;
 
 import static org.junit.Assert.assertEquals;
 
@@ -15,7 +16,7 @@ public class MesaParseHelperLogicTest {
 
         String expectedOutput = "Examen" +
                                 "{Id=0, " +
-                                "fecha=Mon Jan 02 08:00:00 ART 2017, " +
+                                "fecha=2017-01-02T11:00, " +
                                 "aula='405', " +
                                 "materia=Materia{Id=0, nombre='Analisis Matematico', especialidad='ISI'}, " +
                                 "mesa=null}";
@@ -33,7 +34,7 @@ public class MesaParseHelperLogicTest {
 
         String expectedOutput = "Examen" +
                 "{Id=0, " +
-                "fecha=Mon Jan 02 08:00:00 ART 2017, " +
+                "fecha=2017-01-02T11:00, " +
                 "aula='405', " +
                 "materia=Materia{Id=0, nombre='Analisis Matematico', especialidad='ISI'}, " +
                 "mesa=null}";
@@ -51,7 +52,7 @@ public class MesaParseHelperLogicTest {
 
         String expectedOutput = "Examen" +
                 "{Id=0, " +
-                "fecha=Mon Jan 02 08:00:00 ART 2017, " +
+                "fecha=2017-01-02T11:00, " +
                 "aula='405', " +
                 "materia=Materia{Id=0, nombre='Analisis Matematico', especialidad='ISI'}, " +
                 "mesa=null}";
@@ -74,7 +75,7 @@ public class MesaParseHelperLogicTest {
 
     }
 
-    @Test(expected=ParseException.class)
+    @Test(expected=DateTimeParseException.class)
     public void examenBuiltWithWrongDate() throws ParseException {
 
         Examen examen = new MesaParseHelperLogic().buildExamen("ISI",

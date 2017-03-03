@@ -2,7 +2,6 @@ package com.fbr1.mesasutnfrro.model.logic;
 
 import com.ecwid.maleorang.MailchimpException;
 import com.fbr1.mesasutnfrro.model.entity.ApplicationVariables;
-import com.fbr1.mesasutnfrro.model.entity.Llamado;
 import com.fbr1.mesasutnfrro.model.entity.Mesa;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.jsoup.Connection;
@@ -18,12 +17,9 @@ import org.springframework.stereotype.Service;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.text.ParseException;
 import java.util.*;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 @Service
 public class UpdateLogic {

@@ -98,7 +98,15 @@
                 <filtering>true</filtering>
                 <excludes>
                     <exclude>static/node_modules/**</exclude>
+                    <exclude>static/fonts/**</exclude>
                 </excludes>
+            </resource>
+            <resource>
+                <directory>src/main/resources</directory>
+                <filtering>false</filtering>
+                <includes>
+                    <include>static/fonts/**</include>
+                </includes>
             </resource>
         </resources>
         <plugins>

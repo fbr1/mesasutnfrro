@@ -4,7 +4,7 @@ import com.ecwid.maleorang.MailchimpClient;
 import com.ecwid.maleorang.MailchimpException;
 import com.ecwid.maleorang.method.v3_0.members.EditMemberMethod;
 import com.ecwid.maleorang.method.v3_0.members.MemberInfo;
-import com.fbr1.mesasutnfrro.model.forms.SubscribeForm;
+import com.fbr1.mesasutnfrro.forms.SubscribeForm;
 import com.fbr1.mesasutnfrro.model.logic.mailchimp.CreateCampaignMailChimp;
 import com.fbr1.mesasutnfrro.model.logic.mailchimp.EditContentCampaignMailChimp;
 import com.fbr1.mesasutnfrro.model.logic.mailchimp.SendCampaignMailChimp;

@@ -6,7 +6,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.fbr1.mesasutnfrro.model.entity.Llamado;
-import com.fbr1.mesasutnfrro.model.forms.SubscribeForm;
+import com.fbr1.mesasutnfrro.forms.SubscribeForm;
 import com.fbr1.mesasutnfrro.model.logic.LlamadosLogic;
 import com.fbr1.mesasutnfrro.model.logic.SubscribeLogic;
 import com.fbr1.mesasutnfrro.model.logic.UpdateLogic;

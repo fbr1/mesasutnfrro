@@ -51,12 +51,12 @@ public class LlamadosLogic {
      *
      * @param llamado - Llamado object to add
      */
-    public void add(Llamado llamado){
+    public Llamado add(Llamado llamado){
 
         // Check if the Llamado already exists
         if(llamadosRepository.existsByAñoAndNumber(llamado.getAño(), llamado.getNumero())){
             logger.info("The Llamado | Año: "+ llamado.getAño() + " Numero: " + llamado.getNumero() + " already exists");
-            return;
+            return null;
         }
 
         // Extract all unique materias
@@ -87,8 +87,9 @@ public class LlamadosLogic {
             }
         }
 
-        llamadosRepository.save(llamado);
+        Llamado savedLlamado = llamadosRepository.save(llamado);
         logger.info("New Llamado added | Año: "+ llamado.getAño() + " Numero: " + llamado.getNumero());
+        return savedLlamado;
     }
 
     /**
@@ -98,7 +99,7 @@ public class LlamadosLogic {
      * @param añoLlamado - Int
      * @param numeroLlamado - Int
      */
-    public void buildAndAdd(List<Mesa> mesas,int añoLlamado, int numeroLlamado){
+    public Llamado buildAndAdd(List<Mesa> mesas,int añoLlamado, int numeroLlamado){
 
         Llamado llamado = new Llamado(añoLlamado, numeroLlamado, mesas.get(0).getFecha());
 
@@ -112,7 +113,7 @@ public class LlamadosLogic {
         llamado.setWeekType(weekType);
         llamado.setMesas(mesas);
 
-        this.add(llamado);
+        return this.add(llamado);
     }
     /**
      * Validate that the weekType is within range: [1, 2^n], where n is the number of weekdays(7)

@@ -3,6 +3,7 @@ package com.fbr1.mesasutnfrro.model.logic;
 import com.ecwid.maleorang.MailchimpException;
 import com.fbr1.mesasutnfrro.model.entity.ApplicationVariables;
 import com.fbr1.mesasutnfrro.model.entity.Mesa;
+import com.fbr1.mesasutnfrro.util.MesasUtil;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.jsoup.Connection;
 import org.jsoup.Jsoup;
@@ -14,10 +15,13 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.nio.file.Paths;
 import java.text.ParseException;
 import java.util.*;
 
@@ -61,17 +65,41 @@ public class UpdateLogic {
      * @param urls - Iterable of urls in Strings
      */
     public void updateLlamadosFromURLs(Iterable<String> urls) throws IOException,ParseException {
+        List<String> filePaths = new ArrayList<>();
+
+        for(String urlStr : urls) {
+            // Get and open pdf
+            URL url = new URL(urlStr);
+            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+
+            // Get last segment of url
+            String fileName = urlStr.substring(urlStr.lastIndexOf("/") + 1, urlStr.length());
+
+            String filePath = Paths.get("mesas", fileName).toString();
+
+            try(InputStream is = connection.getInputStream()){
+                MesasUtil.saveToDisk(is, filePath);
+            }
+            filePaths.add(filePath);
+        }
+
+        updateLlamadosFromFiles(filePaths);
+    }
+
+    /**
+     * Opens Files, extracts mesa, builds a Llamado and add it to permanent storage
+     *
+     * @param filePaths - Iterable of Files Paths
+     */
+    public void updateLlamadosFromFiles(Iterable<String> filePaths) throws IOException,ParseException {
         List<Mesa> mesas = new ArrayList<>();
         MesasExtractor mesasExtractor = new MesasExtractor();
 
-        for(String urlS : urls) {
+        for(String path : filePaths) {
             // Get and open pdf
-            URL url = new URL(urlS);
-            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+            File file = new File(path);
 
-            try(InputStream is = connection.getInputStream()){
-
-                PDDocument pdd = PDDocument.load(is);
+            try(FileInputStream fis = new FileInputStream(file); PDDocument pdd = PDDocument.load(fis)){
 
                 // Extract mesa
                 Mesa mesa = mesasExtractor.buildMesaFromPDF(pdd);

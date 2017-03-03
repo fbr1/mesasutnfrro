@@ -10,6 +10,7 @@ import com.fbr1.mesasutnfrro.forms.SubscribeForm;
 import com.fbr1.mesasutnfrro.model.logic.LlamadosLogic;
 import com.fbr1.mesasutnfrro.model.logic.SubscribeLogic;
 import com.fbr1.mesasutnfrro.model.logic.UpdateLogic;
+import com.fbr1.mesasutnfrro.util.MesasUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,10 +20,15 @@ import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.Valid;
-import java.io.IOException;
+import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.text.ParseException;
+import java.util.ArrayList;
+import java.util.List;
 
 @Controller
 @SuppressWarnings("serial")
@@ -55,6 +61,30 @@ public class MesasController {
         return "index";
     }
 
+    @PostMapping(value = "/uploadmesas")
+    public ResponseEntity uploadMesas(@RequestParam("file") MultipartFile[] files) throws IOException, ParseException {
+
+        List<String> filePaths = new ArrayList<>();
+
+        Files.createDirectories(Paths.get("mesas"));
+        for(MultipartFile uploadedFile : files) {
+
+            // Get the filename and build the local file path
+            String filename = uploadedFile.getOriginalFilename();
+            String filepath = Paths.get("mesas", filename).toString();
+
+            // Save the file
+            byte [] byteArr=uploadedFile.getBytes();
+            InputStream inputStream = new ByteArrayInputStream(byteArr);
+            MesasUtil.saveToDisk(inputStream,filepath);
+
+            filePaths.add(filepath);
+        }
+
+        updateLogic.updateLlamadosFromFiles(filePaths);
+
+        return new ResponseEntity(HttpStatus.OK);
+    }
 
     @PostMapping(value = "/subscribe")
     public ResponseEntity subscribe(@Valid SubscribeForm subscribeForm, BindingResult bindingResult)

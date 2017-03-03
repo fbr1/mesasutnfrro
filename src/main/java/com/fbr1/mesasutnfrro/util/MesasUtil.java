@@ -1,6 +1,10 @@
 package com.fbr1.mesasutnfrro.util;
 
+import org.apache.pdfbox.io.IOUtils;
+
+import java.io.*;
 import java.text.Collator;
+import java.util.List;
 
 public class MesasUtil {
     /**
@@ -40,5 +44,26 @@ public class MesasUtil {
         }else{
             return false;
         }
+    }
+
+    /**
+     * Saves files to disk
+     * Accepts inputStreams coming from files or HTTP connections
+     *
+     * @param is - InputStream
+     * @param filePath - Location to save the file
+     */
+    public static void saveToDisk(InputStream is, String filePath) throws IOException{
+        File targetFile = new File(filePath);
+        OutputStream outStream = new FileOutputStream(targetFile);
+
+        byte[] buffer = new byte[8 * 1024];
+        int bytesRead;
+        while ((bytesRead = is.read(buffer)) != -1) {
+            outStream.write(buffer, 0, bytesRead);
+        }
+        IOUtils.closeQuietly(is);
+        IOUtils.closeQuietly(outStream);
+
     }
 }

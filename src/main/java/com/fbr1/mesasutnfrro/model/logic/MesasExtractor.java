@@ -59,8 +59,6 @@ public class MesasExtractor {
 
         PDFTextStripper stripper = new PDFTextStripper();
         String text=normalizeText(cleanText(stripper.getText(pdd)));
-        
-        pdd.close();
 
         return extractMesa(text);
     }

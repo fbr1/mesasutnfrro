@@ -270,7 +270,7 @@ function getDia(dayNumber) {
 
 function formatearFecha(milisegundos) {
     var fecha = new Date(milisegundos);
-    var salida = getDia(fecha.getDay()) + ' ' +fecha.getDate() + '/' + (fecha.getMonth()+1) + '/' + fecha.getFullYear();
+    var salida = getDia(fecha.getUTCDay()) + ' ' +fecha.getUTCDate() + '/' + (fecha.getUTCMonth()+1) + '/' + fecha.getUTCFullYear();
     return salida;
 }
 
@@ -282,7 +282,7 @@ function formatearFechaHora(milisegundos) {
     return salida;
 }
 function formatearHora(milisegundos) {
-    var fecha = new Date(milisegundos);
+    var fecha = new Date(milisegundos + '.000Z');
     salida = fecha.getHours() + ':'
             + (fecha.getMinutes() < 10 ? fecha.getMinutes() + '0' : fecha.getMinutes());
     return salida;

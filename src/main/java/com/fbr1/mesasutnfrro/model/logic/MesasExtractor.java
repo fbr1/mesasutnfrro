@@ -276,9 +276,8 @@ public class MesasExtractor {
     public Mesa extractMesa(String text) throws ParseException{
 
         // Transform date from String to Date
-        ZoneId argZone = ZoneId.of(MesasExtractor.TIMEZONE);
-        DateTimeFormatter argTimeFormatter = DateTimeFormatter.ofPattern(DATE_FORMAT).withZone(argZone);
-        LocalDate mesaDate = ZonedDateTime.parse(mesaDateStr, argTimeFormatter).withZoneSameInstant(UTC).toLocalDate();
+        DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern(DATE_FORMAT);
+        LocalDate mesaDate = LocalDate.parse(mesaDateStr,dateFormatter);
 
         // Parse text to Examenes
         Mesa mesa = new MesaParseHelperLogic(mesaDateStr).buildAndGetMesa(text);

@@ -5,6 +5,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import com.fbr1.mesasutnfrro.forms.MesaPDFValidator;
 import com.fbr1.mesasutnfrro.model.entity.Llamado;
 import com.fbr1.mesasutnfrro.forms.SubscribeForm;
 import com.fbr1.mesasutnfrro.model.logic.LlamadosLogic;
@@ -63,6 +64,13 @@ public class MesasController {
 
     @PostMapping(value = "/uploadmesas")
     public ResponseEntity uploadMesas(@RequestParam("file") MultipartFile[] files) throws IOException, ParseException {
+
+        MesaPDFValidator mesaPDFValidator = new MesaPDFValidator(files);
+
+        if(!mesaPDFValidator.isValid()){
+            logger.info("Error al subir llamados: " + mesaPDFValidator.getMessage());
+            return new ResponseEntity<>(mesaPDFValidator.getMessage(), HttpStatus.BAD_REQUEST);
+        }
 
         List<String> filePaths = new ArrayList<>();
 

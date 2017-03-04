@@ -66,4 +66,25 @@ public class MesasUtil {
         IOUtils.closeQuietly(outStream);
 
     }
+    /**
+     * Check if the file starts with %PDF-
+     *
+     * @param data - Byte array of a file
+     * @return  boolean - Whether the file is a PDF or not
+     */
+    public static boolean checkIsPDF(byte[] data)
+    {
+        if(data != null && 
+                data.length > 4 &&
+                data[0] == 0x25 && // %
+                data[1] == 0x50 && // P
+                data[2] == 0x44 && // D
+                data[3] == 0x46 && // F
+                data[4] == 0x2D) // -
+        {
+            return true;
+        }
+        return false;
+
+    }
 }

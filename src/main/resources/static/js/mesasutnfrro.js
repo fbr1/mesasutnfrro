@@ -170,13 +170,14 @@ function ViewModel(data, options) {
             },
             success: function(data, status, jqXHR) {
                 $('#modalSubscribe').modal('close');
+                Materialize.toast('Email Subscripto Correctamente', 4000);
             },
             error: function(jqXHR, status, error) {
                 Materialize.toast('Ocurrio un error al procesar el email', 4000)
             },
             complete: function(jqXHR, status) {
                 $("#loader_subscripcion").css('visibility', 'hidden');
-                Materialize.toast('Email Subscripto Correctamente', 4000);
+
             }
         });
     }
@@ -198,13 +199,18 @@ function ViewModel(data, options) {
             },
             success: function(data, status, jqXHR) {
                 $('#modalSubirLlamado').modal('close');
+                Materialize.toast('Llamado Subido Correctamente', 4000);
             },
             error: function(jqXHR, status, error) {
-                Materialize.toast('Ocurrio un error al subir las mesas', 4000)
+                message = 'Ocurrio un error al subir las mesas';
+                if(jqXHR.responseText !== undefined){
+                    message = jqXHR.responseText;
+                }
+                Materialize.toast(message, 4000);
             },
             complete: function(jqXHR, status) {
+                $("#fileinput").val('');
                 $("#loader_subir_llamado").css('visibility', 'hidden');
-                Materialize.toast('Llamado Subido Correctamente', 4000);
             }
         });
     }

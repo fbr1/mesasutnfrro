@@ -2,6 +2,7 @@ package com.fbr1.mesasutnfrro.model.logic;
 
 import com.ecwid.maleorang.MailchimpException;
 import com.fbr1.mesasutnfrro.model.entity.ApplicationVariables;
+import com.fbr1.mesasutnfrro.model.entity.Llamado;
 import com.fbr1.mesasutnfrro.model.entity.Mesa;
 import com.fbr1.mesasutnfrro.util.MesasUtil;
 import org.apache.pdfbox.pdmodel.PDDocument;
@@ -44,19 +45,32 @@ public class UpdateLogic {
     public void checkUpdatesAndCrawl() throws IOException, ParseException, MailchimpException {
         if(isContentNew()){
 
-            updateLlamadosFromURLs(this.urls);
+            if(updateLlamadosFromURLs(this.urls) != null){
+                // If all went well, store used URLs
+                visitedURLsLogic.addAll(this.urls);
 
-            // If all went well, store used URLs
-            visitedURLsLogic.addAll(this.urls);
+                // Create Campaign
+                String campaign_id = subscribeLogic.createNewCampaign();
 
-            // Create Campaign
-            String campaign_id = subscribeLogic.createNewCampaign();
+                // Notify subscription users of new content
+                subscribeLogic.sendCampaign(campaign_id);
 
-            // Notify subscription users of new content
-            subscribeLogic.sendCampaign(campaign_id);
-
-            logger.info("Add URLs: ", this.urls);
+                logger.info("Add URLs: ", this.urls);
+            }
         }
+    }
+
+    /**
+     * Fixes errors in URLs such as a blank character.
+     */
+
+    public void validateURLs(){
+        Set<String> fixedUrls = new HashSet<>();
+        for(String urlStr : urls) {
+            urlStr = urlStr.replace(" ", "%20");
+            fixedUrls.add(urlStr);
+        }
+        this.urls = fixedUrls;
     }
 
     /**
@@ -64,7 +78,7 @@ public class UpdateLogic {
      *
      * @param urls - Iterable of urls in Strings
      */
-    public void updateLlamadosFromURLs(Iterable<String> urls) throws IOException,ParseException {
+    public Llamado updateLlamadosFromURLs(Iterable<String> urls) throws IOException,ParseException {
         List<String> filePaths = new ArrayList<>();
 
         for(String urlStr : urls) {
@@ -83,7 +97,7 @@ public class UpdateLogic {
             filePaths.add(filePath);
         }
 
-        updateLlamadosFromFiles(filePaths);
+        return updateLlamadosFromFiles(filePaths);
     }
 
     /**
@@ -91,7 +105,7 @@ public class UpdateLogic {
      *
      * @param filePaths - Iterable of Files Paths
      */
-    public void updateLlamadosFromFiles(Iterable<String> filePaths) throws IOException,ParseException {
+    public Llamado updateLlamadosFromFiles(Iterable<String> filePaths) throws IOException,ParseException {
         List<Mesa> mesas = new ArrayList<>();
         MesasExtractor mesasExtractor = new MesasExtractor();
 
@@ -107,7 +121,7 @@ public class UpdateLogic {
             }
         }
 
-        llamadosLogic.buildAndAdd(mesas, mesasExtractor.getAñoLlamado(), mesasExtractor.getNroLlamado());
+        return llamadosLogic.buildAndAdd(mesas, mesasExtractor.getAñoLlamado(), mesasExtractor.getNroLlamado());
     }
 
     /**
@@ -119,6 +133,8 @@ public class UpdateLogic {
 
         // If crawling is successful
         if( crawl(CRAWLING_PAGE) ){
+
+            validateURLs();
 
             Set<String> processedURLs = visitedURLsLogic.getAll();
 

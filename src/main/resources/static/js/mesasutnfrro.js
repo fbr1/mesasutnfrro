@@ -77,7 +77,11 @@ Examen.prototype.toJSON = function()
 function Mesa(data) {
     var self = this;
     ko.mapping.fromJS(data, mapping, self);
-    
+
+    self.examenes = self.examenes.sort(function(left, right) {
+        return left.fecha() > right.fecha() ? 1 : -1;
+    });
+
     self.examenesFiltrados = ko.computed(function() {
         return self.examenes().filter(function(examen) {
             return examen.pasaFiltros();
@@ -158,7 +162,7 @@ function ViewModel(data, options) {
     self.filtroMateria = ko.observable();
     
     self.mesas = self.mesas.sort(function(left, right) {
-        return left.fecha() > right.fecha() ? 1 : -1;
+        return left.fecha() < right.fecha() ? 1 : -1;
     });
 
     self.subscribe = function(formElement) {

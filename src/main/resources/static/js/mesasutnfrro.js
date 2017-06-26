@@ -25,6 +25,7 @@ function Examen(data) {
 
     self.EditExamenDialog = function(item){
         viewModel.selectedItem(ko.mapping.fromJS(ko.toJS(item)));
+        Materialize.updateTextFields();
     };
 
     self.saveExamenChanges = function(item) {
@@ -131,7 +132,6 @@ function ViewModel(data, options) {
         }
         return especialidad;
     };
-    
     
     ko.mapping.fromJS(data, options, self);
     
@@ -240,14 +240,17 @@ function ViewModel(data, options) {
             success: function(data, status, jqXHR) {
                 $('#modalEditExamen').modal('close');
                 Materialize.toast('Examen actualizado correctamente', 4000);
+                loaderSwitch(true);
+                ko.mapping.fromJS(data, options, self);
+                loadDropdown();
+                loaderSwitch(false);
             },
             error: function(jqXHR, status, error) {
-                debugger;
                 message = 'Ocurrio un error al editar el examen';
                 if(jqXHR.responseText !== undefined){
                     message = jqXHR.responseText;
                 }
-                Materialize.toast(message, 4000)
+                Materialize.toast(message, 4000);
             },
             complete: function(jqXHR, status) {
                 $("#loader_edit_examen").css('visibility', 'hidden');
@@ -283,53 +286,74 @@ function  iniMarkThings() {
     });
 }
 
+var loaderVisible = false;
+
+function loaderSwitch(val){
+    if(val === true){
+        $("#loader").show();
+        $('#mesas').hide();
+    }else{
+        $("#loader").hide();
+        $('#mesas').show();
+    }
+
+}
+
 $(document).ready(function () {
     iniMaterialThings();
 
     // First Load
     // Take inline data
 
-    $("#loader").show();
-    var data = JSON.parse(document.getElementById('data').innerHTML);
-    viewModel = new ViewModel(data, mapping);
-    ko.applyBindings(viewModel);
-    iniMarkThings();
-    $("#loader").hide();
-
-     $('.dropdown-button').dropdown({
-          inDuration: 300,
-          outDuration: 225,
-          constrainWidth: false, // Does not change width of dropdown to that of the activator
-          hover: false, // Activate on hover
-          gutter: 0, // Spacing from edge
-          belowOrigin: false, // Displays dropdown below the button
-          alignment: 'left', // Displays dropdown with edge aligned to the left of button
-          stopPropagation: false // Stops event propagation
-        }
-      );
+//    loaderSwitch(true);
+//    var data = JSON.parse(document.getElementById('data').innerHTML);
+//    viewModel = new ViewModel(data, mapping);
+//    ko.applyBindings(viewModel);
+//    iniMarkThings();
+//    loaderSwitch(false);
 
     // Old ajax request
     
-//    var settings = {
-//        url: "/rest",
-//        dataType: "json",
-//        beforeSend: function(jqXHR, settings) {
-//            $("#loader").show();
-//        },
-//        success: function(data, status, jqXHR) {
-//            viewModel = new ViewModel(data, mapping);
-//            ko.applyBindings(viewModel);
-//            iniMarkThings();
-//        },
-//        error: function(jqXHR, status, error) {
-//            alert("Ocurrio un error al obtener los datos" + error.toString());
-//        },
-//        complete: function(jqXHR, status) {
-//            $("#loader").hide();
-//        }
-//    };
-//    $.ajax(settings);
+    var settings = {
+        url: "/rest/",
+        dataType: "json",
+        contentType: "json",
+        beforeSend: function(jqXHR, settings) {
+            loaderSwitch(true);
+        },
+        success: function(data, status, jqXHR) {
+            viewModel = new ViewModel(data, mapping);
+            ko.applyBindings(viewModel);
+            iniMarkThings();
+            loadDropdown();
+        },
+        error: function(jqXHR, status, error) {
+            alert("Ocurrio un error al obtener los datos" + error.toString());
+        },
+        complete: function(jqXHR, status) {
+            loaderSwitch(false);
+        }
+    };
+    $.ajax(settings);
+
+
+
+
 });
+
+function loadDropdown(){
+    $('.dropdown-button').dropdown({
+              inDuration: 300,
+              outDuration: 225,
+              constrainWidth: false, // Does not change width of dropdown to that of the activator
+              hover: false, // Activate on hover
+              gutter: 0, // Spacing from edge
+              belowOrigin: false, // Displays dropdown below the button
+              alignment: 'left', // Displays dropdown with edge aligned to the left of button
+              stopPropagation: false // Stops event propagation
+            }
+          );
+}
 
 function getDia(dayNumber) {
     var weekday = new Array(7);

@@ -8,7 +8,8 @@ import com.fbr1.mesasutnfrro.model.entity.Error;
 import com.fbr1.mesasutnfrro.model.entity.Examen;
 import com.fbr1.mesasutnfrro.model.entity.Llamado;
 import com.fbr1.mesasutnfrro.model.entity.Mesa;
-import com.fbr1.mesasutnfrro.model.exception.ObjetoNotFoundException;
+import com.fbr1.mesasutnfrro.model.exception.MesasUtnFrroException;
+import com.fbr1.mesasutnfrro.model.logic.ExamenLogic;
 import com.fbr1.mesasutnfrro.model.logic.LlamadosLogic;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -49,37 +50,17 @@ public class MesasRESTService {
 
     @RequestMapping(value= "/examen/{id}", method = RequestMethod.PUT)
     public Llamado updateExamen(@PathVariable long id, @RequestBody Examen examen) {
-        Examen oldExamen = examenRepository.findOne(id);
-        if (oldExamen == null) { throw new ObjetoNotFoundException("No se ha podido actualizar el examen.");}
-        oldExamen.setAula(examen.getAula());
-        oldExamen.setFecha(examen.getFecha());
-        Mesa mesaActual = oldExamen.getMesa();
-        if((examen.getMesa() != null) && (oldExamen.getMesa().getId() != examen.getMesa().getId())) {
-            Mesa mesaNueva = mesaRepository.findOne(examen.getMesa().getId());
-            if (mesaNueva == null) {throw new ObjetoNotFoundException("La mesa a la cuál quiere cambiar el examen no existe");};
-            mesaActual.getExamenes().remove(oldExamen);
-            mesaNueva.getExamenes().add(oldExamen);
-            mesaRepository.save(mesaActual);
-            mesaRepository.save(mesaNueva);
-            oldExamen.setMesa(mesaNueva);
-        }
-        examenRepository.save(oldExamen);
-        Llamado llamado = mesaActual.getLlamado();
-        return llamadosLogic.getLlamado(llamado.getAño(),llamado.getNumero());
-    }
-
-    @ExceptionHandler(ObjetoNotFoundException.class)
-    public ResponseEntity<Error> objetoNotFound(ObjetoNotFoundException e) {
-        String message = e.getMessage();
-        Error error = new Error(1, message);
-        return new ResponseEntity<Error>(error, HttpStatus.NOT_FOUND);
+        examenLogic.update(examen);
+        return llamadosLogic.getlastLlamado();
+//        Llamado llamado = mesaActual.getLlamado();
+//        return llamadosLogic.getLlamado(llamado.getAño(),llamado.getNumero());
     }
 
     @Autowired
     private LlamadosLogic llamadosLogic;
 
     @Autowired
-    private ExamenRepository examenRepository;
+    private ExamenLogic examenLogic;
 
     @Autowired
     private MesaRepository mesaRepository;

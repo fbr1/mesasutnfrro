@@ -25,10 +25,9 @@ function Examen(data) {
 
     self.EditExamenDialog = function(item){
         viewModel.selectedItem(ko.mapping.fromJS(ko.toJS(item)));
-        viewModel.showEditDialog(true);
     };
 
-    self.savechanges = function(item) {
+    self.saveExamenChanges = function(item) {
        viewModel.updateExamen(viewModel.selectedItem);
        viewModel.selectedItem(null);
     };
@@ -121,8 +120,6 @@ function ViewModel(data, options) {
 
     self.selectedItem = ko.observable();
 
-    self.showEditDialog = ko.observable(false);
-
     var getEspecialidad = function() {
         var especialidad = "ALL";
         var especialidadFromCookie = $.cookie("especialidad");
@@ -180,7 +177,11 @@ function ViewModel(data, options) {
                 Materialize.toast('Email Subscripto Correctamente', 4000);
             },
             error: function(jqXHR, status, error) {
-                Materialize.toast('Ocurrio un error al procesar el email', 4000)
+                message = 'Ocurrio un error al procesar el email';
+                if(jqXHR.responseText !== undefined){
+                    message = jqXHR.responseText;
+                }
+                Materialize.toast(message, 4000);
             },
             complete: function(jqXHR, status) {
                 $("#loader_subscripcion").css('visibility', 'hidden');
@@ -241,7 +242,12 @@ function ViewModel(data, options) {
                 Materialize.toast('Examen actualizado correctamente', 4000);
             },
             error: function(jqXHR, status, error) {
-                Materialize.toast('Ocurrio un error al actualizar el Examen', 4000)
+                debugger;
+                message = 'Ocurrio un error al editar el examen';
+                if(jqXHR.responseText !== undefined){
+                    message = jqXHR.responseText;
+                }
+                Materialize.toast(message, 4000)
             },
             complete: function(jqXHR, status) {
                 $("#loader_edit_examen").css('visibility', 'hidden');

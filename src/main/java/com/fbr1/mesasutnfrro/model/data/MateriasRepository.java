@@ -7,4 +7,6 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 public interface MateriasRepository extends CrudRepository<Materia, String> {
 
+    Materia findByNombreAndEspecialidad(String nombre, String especialidad);
+
 }

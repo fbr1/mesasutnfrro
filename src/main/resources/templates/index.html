@@ -131,7 +131,7 @@
 
                             <!-- Dropdown Structure -->
                             <ul data-bind="attr: { 'id': 'opciones' + id() }" class='dropdown-content'>
-                                <li><a href="#" data-bind="click: EditExamenDialog">Editar</a></li>
+                                <li><a href="#modalEditExamen" class="modal-trigger" data-bind="click: EditExamenDialog">Editar</a></li>
                                 <li class="divider"></li>
                                 <li><a href="#!">Borrar</a></li>
                             </ul>
@@ -199,7 +199,7 @@
                         <div class="file-field input-field">
                             <div class="btn">
                                 <span>File</span>
-                                <input id="fileinput" name="file" type="file" multiple>
+                                <input id="fileinput" name="file" type="file" multiple required>
                             </div>
                             <div class="file-path-wrapper">
                                 <input class="file-path validate" type="text" placeholder="Suba uno o más archivos">
@@ -217,8 +217,8 @@
         </form>
     </div>
     <!-- Modal Edit Examen -->
-    <div sec:authorize="isAuthenticated()" id="modalEditExamen" data-bind="with: selectedItem, modal:showEditDialog" class="modal" >
-        <form method="post">
+    <div sec:authorize="isAuthenticated()" id="modalEditExamen" data-bind="with: selectedItem" class="modal" >
+        <form data-bind="submit: saveExamenChanges" method="post">
             <div class="modal-content">
                 <h5 data-bind="text "></h5>
                 <div class="row">
@@ -243,7 +243,7 @@
                 </div>
             </div>
             <div class="modal-footer center-align ">
-                <button data-bind="click: savechanges" type="submit" class="modal-action waves-effect btn">Guardar</button>
+                <button type="submit" class="modal-action waves-effect btn">Guardar</button>
             </div>
             <div id="loader_edit_examen" class="progress" style="visibility:hidden">
                 <div class="indeterminate"></div>

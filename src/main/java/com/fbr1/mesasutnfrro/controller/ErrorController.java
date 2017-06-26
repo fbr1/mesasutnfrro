@@ -1,6 +1,7 @@
 package com.fbr1.mesasutnfrro.controller;
 
 
+import com.fbr1.mesasutnfrro.model.exception.MesasUtnFrroException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -19,6 +20,10 @@ public class ErrorController {
     public ResponseEntity exception(final Throwable throwable) {
         logger.error("Exception during execution of the application", throwable);
 
-        return new ResponseEntity<>("Hubo un error con la acción realizada", HttpStatus.INTERNAL_SERVER_ERROR);
+        if (throwable instanceof MesasUtnFrroException){
+            return new ResponseEntity<>(throwable.getMessage(), ((MesasUtnFrroException) throwable).getHttpStatus());
+        }else{
+            return new ResponseEntity<>("Hubo un error en el servidor", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 }

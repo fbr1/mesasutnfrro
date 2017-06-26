@@ -56,6 +56,7 @@ public class Mesa {
     private WeekDay weekDay;
 
     @OneToMany(mappedBy = "mesa", fetch = FetchType.EAGER, cascade={CascadeType.ALL})
+    @JsonManagedReference
     private List<Examen> examenes;
 
     @ManyToOne

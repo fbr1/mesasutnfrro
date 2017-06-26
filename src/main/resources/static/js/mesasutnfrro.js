@@ -1,7 +1,5 @@
 var viewModel;
 
-
-
 var mapping = {
     'mesas': {
         key: function (data) {
@@ -26,15 +24,13 @@ function Examen(data) {
     ko.mapping.fromJS(data, mapping, self);
 
     self.EditExamenDialog = function(item){
-        viewModel.selectedItem(item);
-
+        viewModel.selectedItem(ko.mapping.fromJS(ko.toJS(item)));
         viewModel.showEditDialog(true);
     };
 
-    self.savechanges = function() {
-       alert("saving " + ko.toJSON(self));
+    self.savechanges = function(item) {
+       viewModel.updateExamen(viewModel.selectedItem);
        viewModel.selectedItem(null);
-
     };
         
     self.pasaFiltros = ko.computed(function() {
@@ -66,6 +62,17 @@ function Examen(data) {
         return formatearHora(this.fecha());
     }, self);
 }
+
+Examen.prototype.toJSON = function()
+    {
+        var copy = ko.toJS(this);
+
+        delete (copy.__ko_mapping__);
+        delete (copy.pasaFiltros);
+        delete (copy.fechaFormateada);
+
+        return copy;
+    }
 
 function Mesa(data) {
     var self = this;
@@ -211,6 +218,34 @@ function ViewModel(data, options) {
             complete: function(jqXHR, status) {
                 $("#fileinput").val('');
                 $("#loader_subir_llamado").css('visibility', 'hidden');
+            }
+        });
+    }
+
+    self.updateExamen = function(examen) {
+        var ex = ko.mapping.toJSON(examen);
+        var token = $("meta[name='_csrf']").attr("content");
+        var header = $("meta[name='_csrf_header']").attr("content");
+        $.ajax({
+            url: "/rest/examen/" + examen().id(),
+            type: 'PUT',
+            dataType: 'json',
+            contentType: 'application/json; charset=utf-8',
+            data: ex,
+            beforeSend: function(jqXHR) {
+                $("#loader_edit_examen").css('visibility', 'visible');
+                jqXHR.setRequestHeader(header, token);
+            },
+            success: function(data, status, jqXHR) {
+                $('#modalEditExamen').modal('close');
+                Materialize.toast('Examen actualizado correctamente', 4000);
+            },
+            error: function(jqXHR, status, error) {
+                Materialize.toast('Ocurrio un error al actualizar el Examen', 4000)
+            },
+            complete: function(jqXHR, status) {
+                $("#loader_edit_examen").css('visibility', 'hidden');
+
             }
         });
     }

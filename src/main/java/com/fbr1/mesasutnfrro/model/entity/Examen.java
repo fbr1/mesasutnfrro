@@ -30,6 +30,7 @@ public class Examen {
 
     @ManyToOne
     @JoinColumn(name = "id_mesa")
+    @JsonBackReference
     private Mesa mesa;
 
     public Examen(LocalDateTime fecha, String aula, Materia materia) {

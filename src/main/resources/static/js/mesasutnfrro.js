@@ -1,5 +1,7 @@
 var viewModel;
 
+var reHora = /^([0-9]|0[0-9]|1[0-9]|2[0]):[0-5][0-9]$/;
+
 var mapping = {
     'mesas': {
         key: function (data) {
@@ -29,6 +31,12 @@ function Examen(data) {
     };
 
     self.saveExamenChanges = function(item) {
+        if(reHora.test(this.fechaFormateada()) === true){
+            var fecha =new Date(this.fecha());
+            var splitted = this.fechaFormateada().split(":");
+            fecha.setHours(splitted[0], splitted[1],0);
+            this.fecha(fecha.toISOString().replace(".000Z",""));
+        }
        viewModel.updateExamen(viewModel.selectedItem);
        viewModel.selectedItem(null);
     };
@@ -58,8 +66,22 @@ function Examen(data) {
         return pasaFiltroEspecialidad(e) && pasaFiltroMateria(m);
     }, self, {deferEvaluation: true});
 
-    self.fechaFormateada = ko.computed(function () {
-        return formatearHora(this.fecha());
+    self.fechaFormateada = ko.computed({
+        read: function(){
+            return formatearHora(self.fecha());
+        },
+        write: function(value){
+            if(reHora.test(value) === true){
+                var fecha =new Date(self.fecha());
+                var splitted = value.split(":");
+                fecha.setHours(splitted[0], splitted[1],0);
+                self.fecha(fecha.toISOString().replace(".000Z",""));
+            }
+        }
+    }, self);
+
+    self.fechaDate = ko.computed(function () {
+        return new Date(this.fecha());
     }, self);
 }
 
@@ -70,6 +92,7 @@ Examen.prototype.toJSON = function()
         delete (copy.__ko_mapping__);
         delete (copy.pasaFiltros);
         delete (copy.fechaFormateada);
+        delete (copy.fechaDate);
 
         return copy;
     }
@@ -79,7 +102,7 @@ function Mesa(data) {
     ko.mapping.fromJS(data, mapping, self);
 
     self.examenes = self.examenes.sort(function(left, right) {
-        return left.fecha() > right.fecha() ? 1 : -1;
+        return left.fechaDate() > right.fechaDate() ? 1 : -1;
     });
 
     self.examenesFiltrados = ko.computed(function() {
@@ -90,6 +113,10 @@ function Mesa(data) {
     
     self.fechaFormateada = ko.computed(function () {
         return formatearFecha(this.fecha());
+    }, self);
+
+    self.fechaDate = ko.computed(function () {
+        return new Date(this.fecha());
     }, self);
 }
 
@@ -160,9 +187,9 @@ function ViewModel(data, options) {
     };
     
     self.filtroMateria = ko.observable();
-    
+
     self.mesas = self.mesas.sort(function(left, right) {
-        return left.fecha() < right.fecha() ? 1 : -1;
+        return left.fechaDate() > right.fechaDate() ? 1 : -1;
     });
 
     self.subscribe = function(formElement) {
@@ -228,6 +255,7 @@ function ViewModel(data, options) {
     }
 
     self.updateExamen = function(examen) {
+        console.log
         var ex = ko.mapping.toJSON(examen);
         var token = $("meta[name='_csrf']").attr("content");
         var header = $("meta[name='_csrf_header']").attr("content");

@@ -17,10 +17,10 @@ public class ExamenLogic {
 
     public Examen update(Examen examen){
 
-        validateExamen(examen);
-
         Examen oldExamen = examenRepository.findOne(examen.getId());
         if (oldExamen == null) { throw new MesasUtnFrroException("No se ha podido actualizar el examen.");}
+
+        validateExamen(oldExamen, examen);
 
         Materia materia = materiasRepository.findByNombreAndEspecialidad(examen.getMateria().getNombre(),
                                                                             examen.getMateria().getEspecialidad());
@@ -34,23 +34,12 @@ public class ExamenLogic {
         // Load new values
         oldExamen.setAula(examen.getAula());
         oldExamen.setMateria(materia);
-//        oldExamen.setFecha(examen.getFecha());
+        oldExamen.setFecha(examen.getFecha());
 
-
-//        Mesa mesaActual = oldExamen.getMesa();
-//        if((examen.getMesa() != null) && (oldExamen.getMesa().getId() != examen.getMesa().getId())) {
-//            Mesa mesaNueva = mesaRepository.findOne(examen.getMesa().getId());
-//            if (mesaNueva == null) {throw new MesasUtnFrroException("La mesa a la cuál quiere cambiar el examen no existe", HttpStatus.NOT_FOUND);}
-//            mesaActual.getExamenes().remove(oldExamen);
-//            mesaNueva.getExamenes().add(oldExamen);
-//            mesaRepository.save(mesaActual);
-//            mesaRepository.save(mesaNueva);
-//            oldExamen.setMesa(mesaNueva);
-//        }
         return examenRepository.save(oldExamen);
     }
 
-    public void validateExamen(Examen examen){
+    public void validateExamen(Examen oldExamen,Examen examen){
         if(examen.getMateria() == null ||
                 examen.getMateria().getNombre().isEmpty() ||
                 examen.getMateria().getEspecialidad().isEmpty() ||
@@ -58,7 +47,10 @@ public class ExamenLogic {
                 examen.getFecha() == null){
 
             throw new MesasUtnFrroException("Hay campos en el Examen que estan vacios");
+        }
 
+        if(examen.getFecha().getDayOfWeek() != oldExamen.getMesa().getFecha().getDayOfWeek()){
+            throw new MesasUtnFrroException("La fecha ingresada pertenece a otra mesa");
         }
     }
 

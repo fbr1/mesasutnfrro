@@ -221,11 +221,7 @@ function ViewModel(data, options) {
                 Materialize.toast('Email Subscripto Correctamente', 4000);
             },
             error: function(jqXHR, status, error) {
-                message = 'Ocurrio un error al procesar el email';
-                if(jqXHR.responseText !== undefined){
-                    message = jqXHR.responseText;
-                }
-                Materialize.toast(message, 4000);
+                Materialize.toast('Ocurrio un error al procesar el email', 4000);
             },
             complete: function(jqXHR, status) {
                 $("#loader_subscripcion").css('visibility', 'hidden');
@@ -254,11 +250,7 @@ function ViewModel(data, options) {
                 Materialize.toast('Llamado Subido Correctamente', 4000);
             },
             error: function(jqXHR, status, error) {
-                message = 'Ocurrio un error al subir las mesas';
-                if(jqXHR.responseText !== undefined){
-                    message = jqXHR.responseText;
-                }
-                Materialize.toast(message, 4000);
+                Materialize.toast('Ocurrio un error al subir las mesas', 4000);
             },
             complete: function(jqXHR, status) {
                 $("#fileinput").val('');
@@ -291,11 +283,7 @@ function ViewModel(data, options) {
                 loaderSwitch(false);
             },
             error: function(jqXHR, status, error) {
-                message = 'Ocurrio un error al editar el examen';
-                if(jqXHR.responseText !== undefined){
-                    message = jqXHR.responseText;
-                }
-                Materialize.toast(message, 4000);
+                Materialize.toast('Ocurrio un error al editar el examen', 4000);
             },
             complete: function(jqXHR, status) {
                 $("#loader_edit_examen").css('visibility', 'hidden');

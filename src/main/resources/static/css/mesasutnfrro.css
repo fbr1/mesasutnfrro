@@ -157,3 +157,7 @@ margin: 0 auto;} }
   @extend .collection;
   overflow: visible;
 }
+
+.collection-header h5{
+    display:inline-block;
+}

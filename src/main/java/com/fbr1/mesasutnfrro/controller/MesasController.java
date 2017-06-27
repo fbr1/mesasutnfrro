@@ -5,9 +5,14 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import com.fbr1.mesasutnfrro.forms.ExamenForm;
+import com.fbr1.mesasutnfrro.forms.ExamenFormValidator;
 import com.fbr1.mesasutnfrro.forms.MesaPDFValidator;
+import com.fbr1.mesasutnfrro.model.entity.Examen;
 import com.fbr1.mesasutnfrro.model.entity.Llamado;
 import com.fbr1.mesasutnfrro.forms.SubscribeForm;
+import com.fbr1.mesasutnfrro.model.exception.MesasUtnFrroException;
+import com.fbr1.mesasutnfrro.model.logic.ExamenLogic;
 import com.fbr1.mesasutnfrro.model.logic.LlamadosLogic;
 import com.fbr1.mesasutnfrro.model.logic.SubscribeLogic;
 import com.fbr1.mesasutnfrro.model.logic.UpdateLogic;
@@ -17,8 +22,10 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.multipart.MultipartFile;
@@ -37,6 +44,12 @@ public class MesasController {
 
     final Logger logger = LoggerFactory.getLogger(com.fbr1.mesasutnfrro.controller.MesasController.class);
 
+    @InitBinder("ExamenForm")
+    protected void initBinder(final WebDataBinder binder) {
+        binder.addValidators(new ExamenFormValidator());
+    }
+
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     @RequestMapping(value = "/updatemesas")
     public ResponseEntity updatemesas() throws IOException, ParseException, MailchimpException {
         if(updateLogic.isTimeForUpdate()){
@@ -47,21 +60,13 @@ public class MesasController {
     }
 
     @GetMapping(value = "/")
-    public String home(@RequestParam(value = "error", defaultValue = "false") boolean error, Model model) throws JsonProcessingException {
+    public String home(@RequestParam(value = "error", defaultValue = "false") boolean error, Model model){
         model.addAttribute("loginError", error);
 
-        Llamado llamado = llamadosLogic.getlastLlamado();
-
-        // Convert to JSON
-        ObjectMapper mapper = new ObjectMapper();
-        mapper.registerModule(new JavaTimeModule());
-        mapper.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
-        String jsonData = mapper.writeValueAsString(llamado);
-
-        model.addAttribute("data",jsonData);
         return "index";
     }
 
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     @PostMapping(value = "/uploadmesas")
     public ResponseEntity uploadMesas(@RequestParam("file") MultipartFile[] files) throws IOException, ParseException {
 
@@ -105,22 +110,26 @@ public class MesasController {
         return new ResponseEntity(HttpStatus.OK);
     }
 
-    @GetMapping(value = "/login_error")
-    public ResponseEntity login_error(@Valid SubscribeForm subscribeForm, BindingResult bindingResult)
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @PostMapping(value = "/examen/new")
+    public Llamado newExamen(@Valid ExamenForm examenForm, BindingResult bindingResult)
             throws IOException, MailchimpException{
-        // TODO change
         if(bindingResult.hasErrors()){
-            return new ResponseEntity(HttpStatus.BAD_REQUEST);
+            logger.info("Error al crear examen: " + bindingResult.getAllErrors());
+            throw new MesasUtnFrroException("Error al validar el examen",HttpStatus.BAD_REQUEST);
         }
-        subscribeLogic.saveSubscriber(subscribeForm);
-        return new ResponseEntity(HttpStatus.OK);
+        Examen examen = examenLogic.saveExamen(examenForm);
+        return examen.getMesa().getLlamado();
     }
+
+    @Autowired
+    private ExamenLogic examenLogic;
 
     @Autowired
     private LlamadosLogic llamadosLogic;
 
     @Autowired
-    private  UpdateLogic updateLogic;
+    private UpdateLogic updateLogic;
 
     @Autowired
     private SubscribeLogic subscribeLogic;

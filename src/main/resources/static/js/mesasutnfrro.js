@@ -101,6 +101,11 @@ function Mesa(data) {
     var self = this;
     ko.mapping.fromJS(data, mapping, self);
 
+    self.NewExamenDialog = function(item){
+        Materialize.updateTextFields();
+        viewModel.selectedMesa(item.id());
+    };
+
     self.examenes = self.examenes.sort(function(left, right) {
         return left.fechaDate() > right.fechaDate() ? 1 : -1;
     });
@@ -157,6 +162,7 @@ function ViewModel(data, options) {
      self.number = data.number;
 
     self.selectedItem = ko.observable();
+    self.selectedMesa = ko.observable();
 
     var getEspecialidad = function() {
         var especialidad = "ALL";
@@ -190,6 +196,7 @@ function ViewModel(data, options) {
         } else {
             $.cookie("especialidad", especialidad, { expires : 30}); //Expira en 30 días
         }
+        loadDropdown();
     };
     
     self.filtroMateria = ko.observable();
@@ -297,6 +304,35 @@ function ViewModel(data, options) {
         });
     }
 
+    self.newExamen = function(formElement) {
+        var token = $("meta[name='_csrf']").attr("content");
+        var header = $("meta[name='_csrf_header']").attr("content");
+        $.ajax({
+            url: "/examen/new/",
+            type: 'POST',
+            data: $(formElement).serialize(),
+            beforeSend: function(jqXHR) {
+                $("#loader_new_examen").css('visibility', 'visible');
+                jqXHR.setRequestHeader(header, token);
+            },
+            success: function(data, status, jqXHR) {
+                $('#modalNewExamen').modal('close');
+                Materialize.toast('Examen creado correctamente', 4000);
+                loaderSwitch(true);
+                ko.mapping.fromJS(data, options, self);
+                loadDropdown();
+                loaderSwitch(false);
+            },
+            error: function(jqXHR, status, error) {
+                Materialize.toast('Ocurrio un error al crear un nuevo examen', 4000);
+            },
+            complete: function(jqXHR, status) {
+                $("#loader_new_examen").css('visibility', 'hidden');
+
+            }
+        });
+    }
+
     self.updateViewModel = function(data) {
          self.first(data.first);
          self.last(data.last);
@@ -357,7 +393,7 @@ function loadLLamado(page, success) {
             loadDropdown();
         },
         error: function(jqXHR, status, error) {
-            alert("Ocurrio un error al obtener los datos" + error.toString());
+            Materialize.toast('Error Ocurrido al obtener el llamado', 4000);
         },
         complete: function(jqXHR, status) {
             loaderSwitch(false);

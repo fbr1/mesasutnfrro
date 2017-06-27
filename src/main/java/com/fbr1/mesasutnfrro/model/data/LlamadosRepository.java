@@ -3,13 +3,14 @@ package com.fbr1.mesasutnfrro.model.data;
 import com.fbr1.mesasutnfrro.model.entity.Llamado;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
+import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.data.repository.query.Param;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
 @Transactional
-public interface LlamadosRepository extends CrudRepository<Llamado, Long> {
+public interface LlamadosRepository extends PagingAndSortingRepository<Llamado, Long> {
 
     Llamado findByAñoAndNumero(int año, int numero);
 

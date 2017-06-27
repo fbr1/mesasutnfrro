@@ -347,7 +347,7 @@ $(document).ready(function () {
     // Old ajax request
     
     var settings = {
-        url: "/rest/",
+        url: "/rest/llamado/last/",
         dataType: "json",
         contentType: "json",
         beforeSend: function(jqXHR, settings) {

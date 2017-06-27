@@ -14,6 +14,8 @@ import com.fbr1.mesasutnfrro.model.logic.LlamadosLogic;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -24,14 +26,22 @@ public class MesasRESTService {
 
     private final static Logger logger = LoggerFactory.getLogger(MesasRESTService.class);
 
-    @RequestMapping(value= "/",
+
+    @RequestMapping(value= "/llamado/last",
                     method= RequestMethod.GET)
     public Llamado getLastLlamado(@RequestParam(value="esp", defaultValue="ALL") String esp){
 
         return llamadosLogic.getlastLlamado();
     }
 
-    @RequestMapping(value= "/{year}",
+    @RequestMapping(value= "/llamado/list",
+            method= RequestMethod.GET)
+    public Page<Llamado> getLlamadosPaginado(Pageable pageable){
+
+        return llamadosLogic.getAllLlamadosByPage(pageable);
+    }
+
+    @RequestMapping(value= "/llamado/list/{year}",
                     method=RequestMethod.GET)
     public List<Llamado> getAllLlamadosOfYear(@PathVariable int year,
                                        @RequestParam(value="esp", defaultValue="ALL") String esp){
@@ -39,7 +49,7 @@ public class MesasRESTService {
         return llamadosLogic.getLlamadosOfYear(year);
     }
 
-    @RequestMapping(value=  "/{year}/{numero}",
+    @RequestMapping(value=  "/llamado/list/{year}/{numero}",
                     method=RequestMethod.GET)
     public Llamado getLlamadoOfYear(@PathVariable int year,
                                    @PathVariable int numero,
@@ -50,10 +60,8 @@ public class MesasRESTService {
 
     @RequestMapping(value= "/examen/{id}", method = RequestMethod.PUT)
     public Llamado updateExamen(@PathVariable long id, @RequestBody Examen examen) {
-        examenLogic.update(examen);
-        return llamadosLogic.getlastLlamado();
-//        Llamado llamado = mesaActual.getLlamado();
-//        return llamadosLogic.getLlamado(llamado.getAño(),llamado.getNumero());
+        Examen savedExamen = examenLogic.update(examen);
+        return savedExamen.getMesa().getLlamado();
     }
 
     @Autowired

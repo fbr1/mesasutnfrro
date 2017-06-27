@@ -31,13 +31,15 @@ function Examen(data) {
     };
 
     self.saveExamenChanges = function(item) {
+
         if(reHora.test(this.fechaFormateada()) === true){
             var fecha =new Date(this.fecha());
             var splitted = this.fechaFormateada().split(":");
             fecha.setHours(splitted[0], splitted[1],0);
             this.fecha(fecha.toISOString().replace(".000Z",""));
         }
-       viewModel.updateExamen(viewModel.selectedItem);
+
+        viewModel.updateExamen(viewModel.selectedItem);
        viewModel.selectedItem(null);
     };
         
@@ -104,6 +106,14 @@ function Mesa(data) {
     self.examenes = self.examenes.sort(function(left, right) {
         return left.fechaDate() > right.fechaDate() ? 1 : -1;
     });
+
+    self.NewExamenDialog = function(){
+        Materialize.updateTextFields();
+    };
+
+    self.saveExamenChanges = function(item) {
+
+    };
 
     self.examenesFiltrados = ko.computed(function() {
         return self.examenes().filter(function(examen) {

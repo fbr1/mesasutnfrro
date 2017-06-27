@@ -354,6 +354,7 @@ function loadLLamado(page, success) {
         },
         success: function(data, status, jqXHR) {
             success(data);
+            loadDropdown();
         },
         error: function(jqXHR, status, error) {
             alert("Ocurrio un error al obtener los datos" + error.toString());
@@ -392,7 +393,6 @@ $(document).ready(function () {
         viewModel = new ViewModel(data, mapping);
         ko.applyBindings(viewModel);
         iniMarkThings();
-        loadDropdown();
     });
 
     $('#btn-prev-llamado').on('click', function() { loadPrevLlamado() });

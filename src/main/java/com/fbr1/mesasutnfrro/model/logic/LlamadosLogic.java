@@ -39,7 +39,7 @@ public class LlamadosLogic {
     }
 
     public Page<Llamado> getAllLlamadosByPage(Pageable pageable){
-        return llamadosRepository.findAll(pageable);
+        return llamadosRepository.findByOrderByDateDesc(pageable);
     }
 
     public List<Llamado> getAllByWeekType(int weekType){

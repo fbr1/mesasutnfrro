@@ -148,7 +148,13 @@ ko.bindingHandlers.modal = {
 
 function ViewModel(data, options) {
 
-    var self = this;
+     var self = this;
+
+     self.first = ko.observable(data.first);
+
+     self.last = ko.observable(data.last);
+
+     self.number = data.number;
 
     self.selectedItem = ko.observable();
 
@@ -164,7 +170,7 @@ function ViewModel(data, options) {
         return especialidad;
     };
     
-    ko.mapping.fromJS(data, options, self);
+    ko.mapping.fromJS(data.content[0], options, self);
     
     self.opcionesEspecialidad = ko.observableArray([
         { id: "ALL", especialidad : "Todas"},
@@ -290,6 +296,13 @@ function ViewModel(data, options) {
             }
         });
     }
+
+    self.updateViewModel = function(data) {
+         self.first(data.first);
+         self.last(data.last);
+         self.number = data.number;
+         ko.mapping.fromJS(data.content[0], self);
+    }
     
 }
 
@@ -331,33 +344,16 @@ function loaderSwitch(val){
 
 }
 
-$(document).ready(function () {
-    iniMaterialThings();
-
-    // First Load
-    // Take inline data
-
-//    loaderSwitch(true);
-//    var data = JSON.parse(document.getElementById('data').innerHTML);
-//    viewModel = new ViewModel(data, mapping);
-//    ko.applyBindings(viewModel);
-//    iniMarkThings();
-//    loaderSwitch(false);
-
-    // Old ajax request
-    
+function loadLLamado(page, success) {
     var settings = {
-        url: "/rest/llamado/last/",
+        url: "rest/llamado/list?page=" + page + "&size=1",
         dataType: "json",
         contentType: "json",
         beforeSend: function(jqXHR, settings) {
             loaderSwitch(true);
         },
         success: function(data, status, jqXHR) {
-            viewModel = new ViewModel(data, mapping);
-            ko.applyBindings(viewModel);
-            iniMarkThings();
-            loadDropdown();
+            success(data);
         },
         error: function(jqXHR, status, error) {
             alert("Ocurrio un error al obtener los datos" + error.toString());
@@ -367,9 +363,42 @@ $(document).ready(function () {
         }
     };
     $.ajax(settings);
+}
+
+function loadPrevLlamado() {
+    if(viewModel.last()) {
+        return;
+    }
+    loadLLamado(viewModel.number + 1, function(data) {
+        viewModel.updateViewModel(data);
+    });
+}
+
+function loadNextLLamado() {
+    if(viewModel.first()) {
+        return;
+    }
+    loadLLamado(viewModel.number - 1, function(data) {
+         viewModel.updateViewModel(data);
+     });
+}
+
+$(document).ready(function () {
+    iniMaterialThings();
 
 
 
+    loadLLamado(0, function(data) {
+        viewModel = new ViewModel(data, mapping);
+        ko.applyBindings(viewModel);
+        iniMarkThings();
+        loadDropdown();
+    });
+
+    $('#btn-prev-llamado').on('click', function() { loadPrevLlamado() });
+    $('#btn-next-llamado').on('click', function() { loadNextLLamado() });
+
+    $('#prev-and-next-container').removeClass('hide');
 
 });
 

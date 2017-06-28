@@ -7,6 +7,8 @@
     <link type="text/css" rel="stylesheet" media="screen"
           th:href="@{/css/materialize.css}" />
     <link type="text/css" rel="stylesheet" media="screen"
+          th:href="@{/css/mbox-0.0.1.min.css}" />
+    <link type="text/css" rel="stylesheet" media="screen"
           th:href="@{/css/mesasutnfrro.css}" />
     <meta name="_csrf" th:content="${_csrf.token}"/>
     <!-- default header name is X-CSRF-TOKEN -->
@@ -142,7 +144,7 @@
                             <ul data-bind="attr: { 'id': 'opciones' + id() }" class='dropdown-content'>
                                 <li><a href="#modalEditExamen" class="modal-trigger" data-bind="click: EditExamenDialog">Editar</a></li>
                                 <li class="divider"></li>
-                                <li><a href="#!">Borrar</a></li>
+                                <li><a href="#" data-bind="click: deleteExamen">Borrar</a></li>
                             </ul>
                         </td>
                     </tr>
@@ -315,6 +317,7 @@
 </section>
 <script type="text/javascript" th:src="@{/js/jquery-2.2.3.min.js}"></script>
 <script type="text/javascript" th:src="@{/js/materialize.js}"></script>
+<script type="text/javascript" th:src="@{/js/mbox-0.0.1.min.js}"></script>
 <script type="text/javascript" th:src="@{/js/ko.js}"></script>
 <script type="text/javascript" th:src="@{/js/knockout.mapping-latest.debug.js}"></script>
 <script type="text/javascript" th:src="@{/js/jquery.mark.min.js}"></script>

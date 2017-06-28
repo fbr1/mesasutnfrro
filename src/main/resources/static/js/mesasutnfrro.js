@@ -30,6 +30,26 @@ function Examen(data) {
         Materialize.updateTextFields();
     };
 
+    self.deleteExamen = function(item){
+        mbox.custom({
+            message: '¿Estas seguro que querés borrar el examen?',
+            buttons: [
+                {
+                    label: 'OK',
+                    color: 'a123a132',
+                    callback: function() {
+                        viewModel.deleteExamen(item);
+                    }
+                },
+                {
+                    label: 'Cancelar',
+                    color: 'grey darken-2',
+                }
+            ]
+        });
+
+    }
+
     self.saveExamenChanges = function(item) {
         if(reHora.test(this.fechaFormateada()) === true){
             var fecha =new Date(this.fecha());
@@ -320,6 +340,35 @@ function ViewModel(data, options) {
             }
         });
     }
+
+    self.deleteExamen = function(examen) {
+        var token = $("meta[name='_csrf']").attr("content");
+        var header = $("meta[name='_csrf_header']").attr("content");
+        $.ajax({
+            url: "/rest/examen/" + examen.id(),
+            type: 'DELETE',
+            beforeSend: function(jqXHR) {
+//                $("#loader_edit_examen").css('visibility', 'visible');
+                jqXHR.setRequestHeader(header, token);
+            },
+            success: function(data, status, jqXHR) {
+//                $('#modalEditExamen').modal('close');
+                Materialize.toast('Examen borrado correctamente', 4000);
+                loaderSwitch(true);
+                ko.mapping.fromJS(data, options, self);
+                loadDropdown();
+                loaderSwitch(false);
+            },
+            error: function(jqXHR, status, error) {
+                Materialize.toast('Ocurrio un error al borrar el examen', 4000);
+            },
+            complete: function(jqXHR, status) {
+//                $("#loader_edit_examen").css('visibility', 'hidden');
+
+            }
+        });
+    }
+
 
     self.updateViewModel = function(data) {
          self.first(data.first);

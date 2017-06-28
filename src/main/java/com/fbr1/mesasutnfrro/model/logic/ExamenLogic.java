@@ -103,6 +103,14 @@ public class ExamenLogic {
         return materiaObj;
     }
 
+    public void delete(long id){
+        examenRepository.deleteById(id);
+    }
+
+    public long findLlamadoIdByExamenId(long id){
+        return examenRepository.findLlamadoIdByExamenId(id);
+    }
+
     @Autowired
     private MateriasRepository materiasRepository;
 

@@ -75,18 +75,17 @@
 </nav>
 <section id="container" class="container">
     <div class="card grey lighten-4">
-        <div class="card-content">
+        <div class="card-content center">
             <div id="prev-and-next-container" class="pagination center hide">
-                <li class="waves-effect" data-bind="visible: !$root.last()">
-                    <a id="btn-prev-llamado" class="btn"><i class="material-icons left">chevron_left</i> Llamado anterior</a>
-                </li>
-                <li class="waves-effect" data-bind="visible: !$root.first()">
-                    <a id="btn-next-llamado" class="btn"><i class="material-icons right">chevron_right</i> Llamado posterior</a>
-                </li>
+
+                <a data-bind="css: { disabled: $root.last()}"  id="btn-prev-llamado" class="left btn-floating btn-large waves-effect waves-light "><i class="material-icons left">chevron_left</i></a>
+                <h1>
+                    <span class="card-title" data-bind="text: 'Llamado a examen número ' + numero() + '. Año ' + año()"></span>
+                </h1>
+                <a data-bind="css: { disabled: $root.first()}" id="btn-next-llamado" class="right btn-floating btn-large waves-effect waves-light "><i class="material-icons right">chevron_right</i></a>
+
             </div>
-            <h1>
-                <span class="card-title" data-bind="text: 'Llamado a examen número ' + numero() + '. Año ' + año()"></span>
-            </h1>
+
         </div>
         <div class="card-action">
             <div id="filtros" class="row">
@@ -330,6 +329,7 @@
 <script th:if="${loginError}" type="text/javascript">
     $(document).ready(function() {
         $('#modalLogin').modal('open');
+        Materialize.toast('Los datos de login ingresados son incorrectos', 4000);
     });
 </script>
 </body>

@@ -171,3 +171,8 @@ margin: 0 auto;} }
     bottom: 0;
     left: 0;
 }
+
+#prev-and-next-container h1{
+    font-size: 3rem;
+    display:inline;
+}

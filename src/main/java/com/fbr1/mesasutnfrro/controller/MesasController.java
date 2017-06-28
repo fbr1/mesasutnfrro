@@ -38,12 +38,13 @@ public class MesasController {
     final Logger logger = LoggerFactory.getLogger(com.fbr1.mesasutnfrro.controller.MesasController.class);
 
     @RequestMapping(value = "/updatemesas")
-    public ResponseEntity updatemesas() throws IOException, ParseException, MailchimpException {
-        if(updateLogic.isTimeForUpdate()){
-            updateLogic.checkUpdatesAndCrawl();
+    public ResponseEntity<String> updatemesas() throws IOException, ParseException, MailchimpException {
+        boolean result = false;
+        if(updateLogic.isTimeForUpdate()) {
+            result = updateLogic.checkUpdatesAndCrawl();
         }
-
-        return new ResponseEntity(HttpStatus.OK);
+        String message = "{\"shouldRefresh\": " + result  + "}";
+        return new ResponseEntity(message, HttpStatus.OK);
     }
 
     @GetMapping(value = "/")

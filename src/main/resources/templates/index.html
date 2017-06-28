@@ -28,6 +28,14 @@
                 <a href="#modalSubscribe" class="modal-trigger">Subscribirse</a>
             </li>
             <li sec:authorize="isAuthenticated()">
+                <a class="modal-trigger btn-update-mesas" data-bind="click: updateMesas">
+                    <span data-bind="text: updatingMesas() ? 'Actualizando mesas' : 'Actualizar mesas' ">Actualizar mesas</span>
+                    <div class="progress" data-bind="visible: updatingMesas" style="display: none">
+                        <div class="indeterminate"></div>
+                    </div>
+                </a>
+            </li>
+            <li sec:authorize="isAuthenticated()">
                 <a href="#modalSubirLlamado" class="modal-trigger">Subir Llamado</a>
             </li>
             <li>
@@ -41,6 +49,14 @@
         <ul class="side-nav" id="mobile-demo">
             <li sec:authorize="!isAuthenticated()">
                 <a href="#modalSubscribe" class="waves-effect waves-light btn teal lighten-2 modal-trigger">Subscribirse</a>
+            </li>
+            <li sec:authorize="isAuthenticated()">
+                <a class="modal-trigger btn-update-mesas">
+                    <span>Actualizar mesas</span>
+                    <div class="progress">
+                        <div class="indeterminate"></div>
+                    </div>
+                </a>
             </li>
             <li sec:authorize="isAuthenticated()">
                 <a href="#modalSubirLlamado" class="waves-effect waves-light btn teal lighten-2 modal-trigger">Subir Llamado</a>

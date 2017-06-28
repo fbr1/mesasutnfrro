@@ -42,7 +42,7 @@ public class UpdateLogic {
      * extracts the Llamado from the raw PDFs in the URLs and saves it.
      *
      */
-    public void checkUpdatesAndCrawl() throws IOException, ParseException, MailchimpException {
+    public boolean checkUpdatesAndCrawl() throws IOException, ParseException, MailchimpException {
         if(isContentNew()){
 
             if(updateLlamadosFromURLs(this.urls) != null){
@@ -57,7 +57,9 @@ public class UpdateLogic {
 
                 logger.info("Add URLs: ", this.urls);
             }
+            return true;
         }
+        return false;
     }
 
     /**

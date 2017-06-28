@@ -157,3 +157,13 @@ margin: 0 auto;} }
   @extend .collection;
   overflow: visible;
 }
+
+.btn-update-mesas {
+    position: relative;
+}
+
+.btn-update-mesas > .progress {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+}

@@ -297,6 +297,22 @@ function ViewModel(data, options) {
         });
     }
 
+    self.updatingMesas = ko.observable(false);
+
+    self.updateMesas = function() {
+        self.updatingMesas(true);
+        $.get('/updatemesas').done(function(data) {
+            var data = JSON.parse(data);
+            if(data.shouldRefresh) {
+                Materialize.toast('Hay nuevas mesas disponibles! Recarga la página.', 4000);
+            } else {
+                Materialize.toast('No hay mesas nuevas', 4000);
+            }
+        }).always(function() {
+            self.updatingMesas(false);
+        });
+    }
+
     self.updateViewModel = function(data) {
          self.first(data.first);
          self.last(data.last);
@@ -386,8 +402,6 @@ function loadNextLLamado() {
 
 $(document).ready(function () {
     iniMaterialThings();
-
-
 
     loadLLamado(0, function(data) {
         viewModel = new ViewModel(data, mapping);

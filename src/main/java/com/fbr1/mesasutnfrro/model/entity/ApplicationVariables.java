@@ -13,7 +13,7 @@ public class ApplicationVariables {
     @Column(name = "id_application_vars")
     private int Id;
 
-    @Column(name = "lastupdate")
+    @Column(name = "lastUpdate")
     private Long lastupdate;
 
     // Update interval in ms

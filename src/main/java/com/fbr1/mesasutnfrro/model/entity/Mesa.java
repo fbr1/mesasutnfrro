@@ -57,6 +57,7 @@ public class Mesa {
 
     @OneToMany(mappedBy = "mesa", fetch = FetchType.EAGER, cascade={CascadeType.ALL})
     @JsonManagedReference
+    @OrderBy("fecha ASC")
     private List<Examen> examenes;
 
     @ManyToOne

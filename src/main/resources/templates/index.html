@@ -242,24 +242,12 @@
                             <input data-bind="value: aula" id="aula" name="aula" type="text" required>
                             <label for="aula">Aula</label>
                         </div>
-                        <!--<div class="input-field">-->
-                        <!--<input data-bind="value: materia.especialidad" id="especialidad" name="especialidad" type="text" required disabled>-->
-                        <!--<label for="especialidad">Especialidad</label>-->
-                        <!--</div>-->
                         <div class="input-field">
-                            <select data-bind="options: viewModel.opcionesEspecialidad,
-                                    optionsText:  function(item) {return item.especialidad;},
-                                    value: materia.especialidad" id="especialidad" >
-                                <option value="ISI">Ingeniería en sistemas</option>
-                                <option value="IQ">Ingeniería química</option>
-                                <option value="IM">Ingeniería mecánica</option>
-                                <option value="IC">Ingeniería civil</option>
-                                <option value="IE">Ingeniería eléctrica</option>
-                            </select>
+                            <input data-bind="value: materia.especialidad" id="especialidad" pattern="^ISI|IQ|IC|IE|IM$" title="Tiene que ser alguno de los siguientes: ISI, IQ, IC, IE, IM" name="especialidad" type="text" required disabled>
                             <label for="especialidad">Especialidad</label>
                         </div>
                         <div class="input-field">
-                            <input data-bind="textInput: fechaFormateada" id="hora" pattern="^([0-9]|0[0-9]|1[0-9]|2[0]):[0-5][0-9]$" title="El texto tiene que terner formato de hora HH:MM o H:MM. O la hora es mayor a las 20" name="hora" type="text" required>
+                            <input data-bind="textInput: fechaFormateada" id="hora" pattern="^([0-9]|0[0-9]|1[0-9]|2[0]):[0-5][0-9]$" title="El texto tiene que tener formato de hora HH:MM o H:MM. Y la hora tiene que ser menor a las 21" name="hora" type="text" required>
                             <label for="hora">Hora</label>
                         </div>
                     </div>
@@ -299,7 +287,7 @@
                             <label for="newespecialidad">Especialidad</label>
                         </div>
                         <div class="input-field">
-                            <input id="newhora" pattern="^([0-9]|0[0-9]|1[0-9]|2[0]):[0-5][0-9]$" title="El texto tiene que terner formato de hora HH:MM o H:MM. Y la hora tiene que ser mayor a las 20" name="hora" type="text" required>
+                            <input id="newhora" pattern="^([0-9]|0[0-9]|1[0-9]|2[0]):[0-5][0-9]$" title="El texto tiene que terner formato de hora HH:MM o H:MM. Y la hora tiene que ser menor a las 21" name="hora" type="text" required>
                             <label for="newhora">Hora</label>
                         </div>
                     </div>

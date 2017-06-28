@@ -348,11 +348,9 @@ function ViewModel(data, options) {
             url: "/rest/examen/" + examen.id(),
             type: 'DELETE',
             beforeSend: function(jqXHR) {
-//                $("#loader_edit_examen").css('visibility', 'visible');
                 jqXHR.setRequestHeader(header, token);
             },
             success: function(data, status, jqXHR) {
-//                $('#modalEditExamen').modal('close');
                 Materialize.toast('Examen borrado correctamente', 4000);
                 loaderSwitch(true);
                 ko.mapping.fromJS(data, options, self);
@@ -361,10 +359,6 @@ function ViewModel(data, options) {
             },
             error: function(jqXHR, status, error) {
                 Materialize.toast('Ocurrio un error al borrar el examen', 4000);
-            },
-            complete: function(jqXHR, status) {
-//                $("#loader_edit_examen").css('visibility', 'hidden');
-
             }
         });
     }

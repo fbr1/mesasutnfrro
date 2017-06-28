@@ -112,14 +112,14 @@ public class MesasController {
 
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     @PostMapping(value = "/examen/new")
-    public Llamado newExamen(@Valid ExamenForm examenForm, BindingResult bindingResult)
+    public @ResponseBody Llamado newExamen(@Valid ExamenForm examenForm, BindingResult bindingResult)
             throws IOException, MailchimpException{
         if(bindingResult.hasErrors()){
             logger.info("Error al crear examen: " + bindingResult.getAllErrors());
             throw new MesasUtnFrroException("Error al validar el examen",HttpStatus.BAD_REQUEST);
         }
         Examen examen = examenLogic.saveExamen(examenForm);
-        return examen.getMesa().getLlamado();
+        return llamadosLogic.findOneById(examen.getMesa().getLlamado().getId());
     }
 
     @Autowired

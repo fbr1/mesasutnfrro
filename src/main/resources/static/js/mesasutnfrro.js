@@ -39,6 +39,7 @@ function Examen(data) {
                     color: 'a123a132',
                     callback: function() {
                         viewModel.deleteExamen(item);
+                        mbox.close();
                     }
                 },
                 {

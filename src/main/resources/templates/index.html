@@ -53,9 +53,9 @@
                 <a href="#modalSubscribe" class="waves-effect waves-light btn teal lighten-2 modal-trigger">Subscribirse</a>
             </li>
             <li sec:authorize="isAuthenticated()">
-                <a class="modal-trigger btn-update-mesas">
+                <a class="modal-trigger waves-effect waves-light btn teal lighten-2 btn-update-mesas">
                     <span>Actualizar mesas</span>
-                    <div class="progress">
+                    <div class="progress" style="display: none">
                         <div class="indeterminate"></div>
                     </div>
                 </a>
@@ -79,8 +79,7 @@
             <div id="prev-and-next-container" class="pagination center hide">
 
                 <a data-bind="css: { disabled: $root.last()}"  id="btn-prev-llamado" class="left btn-floating btn-large waves-effect waves-light " title="LLamado anterior"><i class="material-icons left">chevron_left</i></a>
-                <h1>
-                    <span class="card-title" data-bind="text: 'Llamado a examen número ' + numero() + '. Año ' + año()"></span>
+                <h1 class="card-title" data-bind="text: 'Llamado a examen número ' + numero() + '. Año ' + año()">
                 </h1>
                 <a data-bind="css: { disabled: $root.first()}" id="btn-next-llamado" class="right btn-floating btn-large waves-effect waves-light " title="LLamado posterior"><i class="material-icons right">chevron_right</i></a>
 
@@ -107,6 +106,12 @@
                     <input name="Busqueda" placeholder="Comience a escribir..." id="filtroMateria" type="text" class="validate" data-bind="textInput: $root.filtroMateria" />
                     <label for="filtroMateria">Materia</label>
                 </div>
+                <a id="borrarLlamado" sec:authorize="isAuthenticated()" href="#" data-bind="click: borrarLlamado" class="teal lighten-2 btn right">
+                    <span>Borrar Llamado</span>
+                    <div id="loader_borrar_llamado" class="progress" style="visibility:hidden">
+                        <div class="indeterminate"></div>
+                    </div>
+                </a>
             </div>
             <div class="chip" data-bind="text: filtroEspecialidad().especialidad, visible : filtroEspecialidad()" style="display: none">
             </div>
@@ -126,7 +131,7 @@
         <!--ko if: examenesFiltrados().length > 0-->
         <ul class="collection collection-mesas with-header z-depth-2">
             <li class="collection-header">
-                <h5>Mesa día <span data-bind="text: fechaFormateada()"></span></h5>
+                <h5>Mesa día <span data-bind="text: fechaFormateada()"></span><span data-bind="visible: state()=='INCOMPLETE'" sec:authorize="isAuthenticated()"> (Incompleta)</span></h5>
                 <a sec:authorize="isAuthenticated()" href="#modalNewExamen" data-bind="click: NewExamenDialog" class="modal-trigger btn-floating right btn-large waves-effect waves-light red" title="Nuevo examen"><i class="material-icons">add</i></a>
             </li>
 

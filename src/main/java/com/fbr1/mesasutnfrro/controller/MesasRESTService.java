@@ -74,6 +74,14 @@ public class MesasRESTService {
         return llamadosLogic.findOneById(llamadoId);
     }
 
+    @RequestMapping(value= "/llamado/{id}", method = RequestMethod.DELETE)
+    public Llamado deleteLlamado(@PathVariable long id) {
+
+        llamadosLogic.delete(id);
+
+        return llamadosLogic.getlastLlamado();
+    }
+
     @Autowired
     private LlamadosLogic llamadosLogic;
 

@@ -46,6 +46,10 @@ public class LlamadosLogic {
         return llamadosRepository.findByOrderByDateDesc(pageable);
     }
 
+    public void delete(long id){
+        llamadosRepository.deleteById(id);
+    }
+
     public List<Llamado> getAllByWeekType(int weekType){
 
         // Validate that weekType is within range

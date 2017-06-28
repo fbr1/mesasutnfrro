@@ -172,11 +172,20 @@ margin: 0 auto;} }
     left: 0;
 }
 
-#prev-and-next-container h1{
-    font-size: 3rem;
+.card .card-content h1 {
+    font-size: 2rem;
+    display:inline;
+}
+
+.card .card-content .card-title {
+    line-height: 60px;
     display:inline;
 }
 
 .tabla-mesas td:first-child{
     width: 40%;
+}
+
+#borrarLlamado{
+    margin-top: 0.7rem;
 }

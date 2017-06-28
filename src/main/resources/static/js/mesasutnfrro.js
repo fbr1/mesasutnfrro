@@ -172,6 +172,28 @@ function ViewModel(data, options) {
     self.selectedItem = ko.observable();
     self.selectedMesa = ko.observable();
 
+    self.borrarLlamado = function(item){
+        mbox.custom({
+            message: '¿Estas seguro que querés borrar el llamado?: ' + item.id(),
+            buttons: [
+                {
+                    label: 'OK',
+                    color: 'a123a132',
+                    callback: function() {
+                        self.deleteLlamado(item);
+                        mbox.close();
+                    }
+                },
+                {
+                    label: 'Cancelar',
+                    color: 'grey darken-2',
+                }
+            ]
+        });
+
+    }
+
+
     var getEspecialidad = function() {
         var especialidad = "ALL";
         var especialidadFromCookie = $.cookie("especialidad");
@@ -346,6 +368,32 @@ function ViewModel(data, options) {
             }
         });
     }
+
+    self.deleteLlamado = function(llamado) {
+            var token = $("meta[name='_csrf']").attr("content");
+            var header = $("meta[name='_csrf_header']").attr("content");
+            $.ajax({
+                url: "/rest/llamado/" + llamado.id(),
+                type: 'DELETE',
+                beforeSend: function(jqXHR) {
+                    $("#loader_borrar_llamado").css('visibility', 'visible');
+                    jqXHR.setRequestHeader(header, token);
+                },
+                success: function(data, status, jqXHR) {
+                    var $toastContent = $('<span>Llamado borrado correctamente! <input type="button" class="btn" value="Recarga la pagina" onClick="window.location.reload()"></span>');
+                    Materialize.toast($toastContent, 4000);
+                    loaderSwitch(true);
+                    ko.mapping.fromJS(data, options, self);
+                    loadDropdown();
+                    loaderSwitch(false);
+                    $("#loader_borrar_llamado").css('visibility', 'hidden');
+                },
+                error: function(jqXHR, status, error) {
+                    $("#loader_borrar_llamado").css('visibility', 'hidden');
+                    Materialize.toast('Ocurrio un error al borrar el llamado', 4000);
+                }
+            });
+        }
 
     self.updatingMesas = ko.observable(false);
 

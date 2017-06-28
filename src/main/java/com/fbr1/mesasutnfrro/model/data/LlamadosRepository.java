@@ -3,6 +3,7 @@ package com.fbr1.mesasutnfrro.model.data;
 import com.fbr1.mesasutnfrro.model.entity.Llamado;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.PagingAndSortingRepository;
@@ -29,4 +30,9 @@ public interface LlamadosRepository extends PagingAndSortingRepository<Llamado, 
     boolean existsByAñoAndNumber(@Param("año") int año, @Param("numero") int numero);
 
     Page<Llamado> findByOrderByDateDesc(Pageable pageable);
+
+    @Modifying
+    @Transactional
+    @Query("delete from Llamado llamado where llamado.id = :id")
+    void deleteById(@Param("id") long id);
 }

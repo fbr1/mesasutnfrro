@@ -354,7 +354,8 @@ function ViewModel(data, options) {
         $.get('/updatemesas').done(function(data) {
             var data = JSON.parse(data);
             if(data.shouldRefresh) {
-                Materialize.toast('Hay nuevas mesas disponibles! Recarga la página.', 4000);
+                var $toastContent = $('<span>Hay nuevas mesas disponibles! <input type="button" class="btn" value="Recarga la pagina" onClick="window.location.reload()"></span>');
+                Materialize.toast($toastContent, 4000);
             } else {
                 Materialize.toast('No hay mesas nuevas', 4000);
             }

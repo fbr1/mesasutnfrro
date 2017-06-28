@@ -186,6 +186,10 @@ margin: 0 auto;} }
     width: 40%;
 }
 
+.tabla-mesas td:last-child{
+    width: 10%;
+}
+
 #borrarLlamado{
     margin-top: 0.7rem;
 }

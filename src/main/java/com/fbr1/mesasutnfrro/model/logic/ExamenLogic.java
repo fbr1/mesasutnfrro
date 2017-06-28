@@ -78,7 +78,7 @@ public class ExamenLogic {
         // Parse date
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("H:mm");
         LocalTime localTime = LocalTime.parse(examenForm.getHora(), formatter);
-        LocalDateTime fecha = LocalDateTime.of(mesa.getFecha(), localTime);
+        LocalDateTime fecha = LocalDateTime.of(mesa.getFecha(), localTime.plusHours(3));
 
         examen.setMateria(getMateria(examenForm.getMateria(), examenForm.getEspecialidad()));
         examen.setFecha(fecha);

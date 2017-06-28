@@ -100,10 +100,6 @@ function Examen(data) {
             }
         }
     }, self);
-
-    self.fechaDate = ko.computed(function () {
-        return new Date(this.fecha());
-    }, self);
 }
 
 Examen.prototype.toJSON = function()
@@ -113,7 +109,6 @@ Examen.prototype.toJSON = function()
         delete (copy.__ko_mapping__);
         delete (copy.pasaFiltros);
         delete (copy.fechaFormateada);
-        delete (copy.fechaDate);
 
         return copy;
     }
@@ -127,10 +122,6 @@ function Mesa(data) {
         viewModel.selectedMesa(item.id());
     };
 
-    self.examenes = self.examenes.sort(function(left, right) {
-        return left.fechaDate() > right.fechaDate() ? 1 : -1;
-    });
-
     self.examenesFiltrados = ko.computed(function() {
         return self.examenes().filter(function(examen) {
             return examen.pasaFiltros();
@@ -139,10 +130,6 @@ function Mesa(data) {
     
     self.fechaFormateada = ko.computed(function () {
         return formatearFecha(this.fecha());
-    }, self);
-
-    self.fechaDate = ko.computed(function () {
-        return new Date(this.fecha());
     }, self);
 }
 
@@ -221,10 +208,6 @@ function ViewModel(data, options) {
     };
     
     self.filtroMateria = ko.observable();
-
-    self.mesas = self.mesas.sort(function(left, right) {
-        return left.fechaDate() > right.fechaDate() ? 1 : -1;
-    });
 
     self.subscribe = function(formElement) {
         var token = $("meta[name='_csrf']").attr("content");
@@ -371,7 +354,8 @@ function ViewModel(data, options) {
         $.get('/updatemesas').done(function(data) {
             var data = JSON.parse(data);
             if(data.shouldRefresh) {
-                Materialize.toast('Hay nuevas mesas disponibles! Recarga la página.', 4000);
+                var $toastContent = $('<span>Hay nuevas mesas disponibles! <input type="button" class="btn" value="Recarga la pagina" onClick="window.location.reload()"></span>');
+                Materialize.toast($toastContent, 4000);
             } else {
                 Materialize.toast('No hay mesas nuevas', 4000);
             }

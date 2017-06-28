@@ -32,6 +32,7 @@ public class Llamado{
     private int weekType;
 
     @OneToMany(mappedBy="llamado", fetch = FetchType.EAGER, cascade={CascadeType.ALL})
+    @OrderBy("fecha ASC")
     private List<Mesa> mesas;
 
     public Llamado(int año, int numero, LocalDate date, List<Mesa> mesas) {

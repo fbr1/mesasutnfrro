@@ -13,6 +13,8 @@ import java.util.List;
 
 @Transactional
 public interface LlamadosRepository extends PagingAndSortingRepository<Llamado, Long> {
+    @Query("from Llamado llamado where llamado.id = :id")
+    Llamado findById(@Param("id") long id);
 
     Llamado findByAñoAndNumero(int año, int numero);
 

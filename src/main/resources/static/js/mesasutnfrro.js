@@ -30,6 +30,27 @@ function Examen(data) {
         Materialize.updateTextFields();
     };
 
+    self.deleteExamen = function(item){
+        mbox.custom({
+            message: '¿Estas seguro que querés borrar el examen?',
+            buttons: [
+                {
+                    label: 'OK',
+                    color: 'a123a132',
+                    callback: function() {
+                        viewModel.deleteExamen(item);
+                        mbox.close();
+                    }
+                },
+                {
+                    label: 'Cancelar',
+                    color: 'grey darken-2',
+                }
+            ]
+        });
+
+    }
+
     self.saveExamenChanges = function(item) {
         if(reHora.test(this.fechaFormateada()) === true){
             var fecha =new Date(this.fecha());
@@ -101,6 +122,11 @@ function Mesa(data) {
     var self = this;
     ko.mapping.fromJS(data, mapping, self);
 
+    self.NewExamenDialog = function(item){
+        Materialize.updateTextFields();
+        viewModel.selectedMesa(item.id());
+    };
+
     self.examenes = self.examenes.sort(function(left, right) {
         return left.fechaDate() > right.fechaDate() ? 1 : -1;
     });
@@ -157,6 +183,7 @@ function ViewModel(data, options) {
      self.number = data.number;
 
     self.selectedItem = ko.observable();
+    self.selectedMesa = ko.observable();
 
     var getEspecialidad = function() {
         var especialidad = "ALL";
@@ -190,6 +217,7 @@ function ViewModel(data, options) {
         } else {
             $.cookie("especialidad", especialidad, { expires : 30}); //Expira en 30 días
         }
+        loadDropdown();
     };
     
     self.filtroMateria = ko.observable();
@@ -214,11 +242,7 @@ function ViewModel(data, options) {
                 Materialize.toast('Email Subscripto Correctamente', 4000);
             },
             error: function(jqXHR, status, error) {
-                message = 'Ocurrio un error al procesar el email';
-                if(jqXHR.responseText !== undefined){
-                    message = jqXHR.responseText;
-                }
-                Materialize.toast(message, 4000);
+                Materialize.toast('Ocurrio un error al procesar el email', 4000);
             },
             complete: function(jqXHR, status) {
                 $("#loader_subscripcion").css('visibility', 'hidden');
@@ -247,11 +271,7 @@ function ViewModel(data, options) {
                 Materialize.toast('Llamado Subido Correctamente', 4000);
             },
             error: function(jqXHR, status, error) {
-                message = 'Ocurrio un error al subir las mesas';
-                if(jqXHR.responseText !== undefined){
-                    message = jqXHR.responseText;
-                }
-                Materialize.toast(message, 4000);
+                Materialize.toast('Ocurrio un error al subir las mesas', 4000);
             },
             complete: function(jqXHR, status) {
                 $("#fileinput").val('');
@@ -284,11 +304,7 @@ function ViewModel(data, options) {
                 loaderSwitch(false);
             },
             error: function(jqXHR, status, error) {
-                message = 'Ocurrio un error al editar el examen';
-                if(jqXHR.responseText !== undefined){
-                    message = jqXHR.responseText;
-                }
-                Materialize.toast(message, 4000);
+                Materialize.toast('Ocurrio un error al editar el examen', 4000);
             },
             complete: function(jqXHR, status) {
                 $("#loader_edit_examen").css('visibility', 'hidden');
@@ -297,21 +313,57 @@ function ViewModel(data, options) {
         });
     }
 
-    self.updatingMesas = ko.observable(false);
+    self.newExamen = function(formElement) {
+        var token = $("meta[name='_csrf']").attr("content");
+        var header = $("meta[name='_csrf_header']").attr("content");
+        $.ajax({
+            url: "/examen/new/",
+            type: 'POST',
+            data: $(formElement).serialize(),
+            beforeSend: function(jqXHR) {
+                $("#loader_new_examen").css('visibility', 'visible');
+                jqXHR.setRequestHeader(header, token);
+            },
+            success: function(data, status, jqXHR) {
+                $('#modalNewExamen').modal('close');
+                Materialize.toast('Examen creado correctamente', 4000);
+                loaderSwitch(true);
+                ko.mapping.fromJS(data, options, self);
+                loadDropdown();
+                loaderSwitch(false);
+            },
+            error: function(jqXHR, status, error) {
+                Materialize.toast('Ocurrio un error al crear un nuevo examen', 4000);
+            },
+            complete: function(jqXHR, status) {
+                $("#loader_new_examen").css('visibility', 'hidden');
 
-    self.updateMesas = function() {
-        self.updatingMesas(true);
-        $.get('/updatemesas').done(function(data) {
-            var data = JSON.parse(data);
-            if(data.shouldRefresh) {
-                Materialize.toast('Hay nuevas mesas disponibles! Recarga la página.', 4000);
-            } else {
-                Materialize.toast('No hay mesas nuevas', 4000);
             }
-        }).always(function() {
-            self.updatingMesas(false);
         });
     }
+
+    self.deleteExamen = function(examen) {
+        var token = $("meta[name='_csrf']").attr("content");
+        var header = $("meta[name='_csrf_header']").attr("content");
+        $.ajax({
+            url: "/rest/examen/" + examen.id(),
+            type: 'DELETE',
+            beforeSend: function(jqXHR) {
+                jqXHR.setRequestHeader(header, token);
+            },
+            success: function(data, status, jqXHR) {
+                Materialize.toast('Examen borrado correctamente', 4000);
+                loaderSwitch(true);
+                ko.mapping.fromJS(data, options, self);
+                loadDropdown();
+                loaderSwitch(false);
+            },
+            error: function(jqXHR, status, error) {
+                Materialize.toast('Ocurrio un error al borrar el examen', 4000);
+            }
+        });
+    }
+
 
     self.updateViewModel = function(data) {
          self.first(data.first);
@@ -373,7 +425,7 @@ function loadLLamado(page, success) {
             loadDropdown();
         },
         error: function(jqXHR, status, error) {
-            alert("Ocurrio un error al obtener los datos" + error.toString());
+            Materialize.toast('Error Ocurrido al obtener el llamado', 4000);
         },
         complete: function(jqXHR, status) {
             loaderSwitch(false);
@@ -402,6 +454,8 @@ function loadNextLLamado() {
 
 $(document).ready(function () {
     iniMaterialThings();
+
+
 
     loadLLamado(0, function(data) {
         viewModel = new ViewModel(data, mapping);

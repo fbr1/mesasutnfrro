@@ -158,6 +158,10 @@ margin: 0 auto;} }
   overflow: visible;
 }
 
+.collection-header h5{
+    display:inline-block;
+}
+
 .btn-update-mesas {
     position: relative;
 }

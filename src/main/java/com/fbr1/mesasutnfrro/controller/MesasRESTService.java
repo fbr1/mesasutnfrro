@@ -64,6 +64,16 @@ public class MesasRESTService {
         return savedExamen.getMesa().getLlamado();
     }
 
+    @RequestMapping(value= "/examen/{id}", method = RequestMethod.DELETE)
+    public Llamado deleteExamen(@PathVariable long id) {
+
+        long llamadoId = examenLogic.findLlamadoIdByExamenId(id);
+
+        examenLogic.delete(id);
+
+        return llamadosLogic.findOneById(llamadoId);
+    }
+
     @Autowired
     private LlamadosLogic llamadosLogic;
 

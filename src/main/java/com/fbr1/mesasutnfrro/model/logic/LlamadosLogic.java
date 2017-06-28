@@ -38,6 +38,10 @@ public class LlamadosLogic {
         return (List<Llamado>)llamadosRepository.findAll();
     }
 
+    public Llamado findOneById(long id){
+        return llamadosRepository.findById(id);
+    }
+
     public Page<Llamado> getAllLlamadosByPage(Pageable pageable){
         return llamadosRepository.findByOrderByDateDesc(pageable);
     }

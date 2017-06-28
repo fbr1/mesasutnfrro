@@ -7,6 +7,8 @@
     <link type="text/css" rel="stylesheet" media="screen"
           th:href="@{/css/materialize.css}" />
     <link type="text/css" rel="stylesheet" media="screen"
+          th:href="@{/css/mbox-0.0.1.min.css}" />
+    <link type="text/css" rel="stylesheet" media="screen"
           th:href="@{/css/mesasutnfrro.css}" />
     <meta name="_csrf" th:content="${_csrf.token}"/>
     <!-- default header name is X-CSRF-TOKEN -->
@@ -126,6 +128,7 @@
         <ul class="collection collection-mesas with-header z-depth-2">
             <li class="collection-header">
                 <h5>Mesa día <span data-bind="text: fechaFormateada()"></span></h5>
+                <a sec:authorize="isAuthenticated()" href="#modalNewExamen" data-bind="click: NewExamenDialog" class="modal-trigger btn-floating right btn-large waves-effect waves-light red"><i class="material-icons">add</i></a>
             </li>
 
             <li class="collection-item">
@@ -157,7 +160,7 @@
                             <ul data-bind="attr: { 'id': 'opciones' + id() }" class='dropdown-content'>
                                 <li><a href="#modalEditExamen" class="modal-trigger" data-bind="click: EditExamenDialog">Editar</a></li>
                                 <li class="divider"></li>
-                                <li><a href="#!">Borrar</a></li>
+                                <li><a href="#" data-bind="click: deleteExamen">Borrar</a></li>
                             </ul>
                         </td>
                     </tr>
@@ -244,6 +247,7 @@
     <div sec:authorize="isAuthenticated()" id="modalEditExamen" data-bind="with: selectedItem" class="modal" >
         <form data-bind="submit: saveExamenChanges" method="post">
             <div class="modal-content">
+                <h5>Editar Examen</h5>
                 <div class="row">
                     <div class="col s12">
                         <div class="input-field">
@@ -255,11 +259,11 @@
                             <label for="aula">Aula</label>
                         </div>
                         <div class="input-field">
-                            <input data-bind="value: materia.especialidad" id="especialidad" name="especialidad" type="text" required>
+                            <input data-bind="value: materia.especialidad" id="especialidad" pattern="^ISI|IQ|IC|IE|IM$" title="Tiene que ser alguno de los siguientes: ISI, IQ, IC, IE, IM" name="especialidad" type="text" required disabled>
                             <label for="especialidad">Especialidad</label>
                         </div>
                         <div class="input-field">
-                            <input data-bind="textInput: fechaFormateada" id="hora" pattern="^([0-9]|0[0-9]|1[0-9]|2[0]):[0-5][0-9]$" title="El texto tiene que terner formato de hora HH:MM o H:MM. O la hora es mayor a las 20" name="hora" type="text" required>
+                            <input data-bind="textInput: fechaFormateada" id="hora" pattern="^([0-9]|0[0-9]|1[0-9]|2[0]):[0-5][0-9]$" title="El texto tiene que tener formato de hora HH:MM o H:MM. Y la hora tiene que ser menor a las 21" name="hora" type="text" required>
                             <label for="hora">Hora</label>
                         </div>
                     </div>
@@ -273,9 +277,51 @@
             </div>
         </form>
     </div>
+
+    <div sec:authorize="isAuthenticated()" id="modalNewExamen" class="modal" >
+        <form data-bind="submit: newExamen" method="post">
+            <div class="modal-content">
+                <h5>Nuevo Examen</h5>
+                <div class="row">
+                    <div class="col s12">
+                        <div class="input-field">
+                            <input id="newmateria" name="materia" type="text" class="focus" required>
+                            <label for="newmateria">Materia</label>
+                        </div>
+                        <div class="input-field">
+                            <input id="newaula" name="aula" type="text" required>
+                            <label for="newaula">Aula</label>
+                        </div>
+                        <div class="input-field">
+                            <select name="especialidad" id="newespecialidad" required>
+                                <option value="ISI">Ingeniería en sistemas</option>
+                                <option value="IQ">Ingeniería química</option>
+                                <option value="IM">Ingeniería mecánica</option>
+                                <option value="IC">Ingeniería civil</option>
+                                <option value="IE">Ingeniería eléctrica</option>
+                            </select>
+                            <label for="newespecialidad">Especialidad</label>
+                        </div>
+                        <div class="input-field">
+                            <input id="newhora" pattern="^([0-9]|0[0-9]|1[0-9]|2[0]):[0-5][0-9]$" title="El texto tiene que terner formato de hora HH:MM o H:MM. Y la hora tiene que ser menor a las 21" name="hora" type="text" required>
+                            <label for="newhora">Hora</label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer center-align ">
+                <button type="submit" class="modal-action waves-effect btn">Guardar</button>
+            </div>
+            <div id="loader_new_examen" class="progress" style="visibility:hidden">
+                <div class="indeterminate"></div>
+            </div>
+            <input data-bind="attr: { value: selectedMesa }" id="selected_mesa" type="hidden" name="selected_mesa" >
+        </form>
+    </div>
 </section>
 <script type="text/javascript" th:src="@{/js/jquery-2.2.3.min.js}"></script>
 <script type="text/javascript" th:src="@{/js/materialize.js}"></script>
+<script type="text/javascript" th:src="@{/js/mbox-0.0.1.min.js}"></script>
 <script type="text/javascript" th:src="@{/js/ko.js}"></script>
 <script type="text/javascript" th:src="@{/js/knockout.mapping-latest.debug.js}"></script>
 <script type="text/javascript" th:src="@{/js/jquery.mark.min.js}"></script>
